@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pd:pipeline xmlns:pd="xsd://www.illumina.com/ica/cp/pipelinedefinition">
+    <pd:dataInputs>
+        <pd:dataInput code="in" format="FASTA" type="FILE" required="true" multiValue="false">
+            <pd:label>in</pd:label>
+            <pd:description>fasta file input</pd:description>
+        </pd:dataInput>
+    </pd:dataInputs>
+    <pd:steps/>
+</pd:pipeline>
