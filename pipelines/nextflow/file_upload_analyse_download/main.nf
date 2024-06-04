@@ -119,9 +119,12 @@ process checkAnalysisStatus {
     do
         ((\${StatusCheckCount}+=1))
         updatedAnalysisResponse=\$(icav2 projectanalyses get \${analysisId})
-        analysisStatus=\$(echo \${updatedAnalysisResponse} | jq -r ".items[] | select(.reference == "\${analysisRef}").status")
 
-        if [ \${analysisStatus} == "SUCCEEDED" ]; then
+        echo "Checking status of analysis with reference '\${analysisRef}'..."
+        analysisStatus=\$(echo \${updatedAnalysisResponse} | jq -r ".items[] | select(.reference == "\${analysisRef}").status")
+        echo "Current status of analysis is '\${analysisStatus}'..."
+
+        if [[ \${analysisStatus} == "SUCCEEDED" ]]; then
             echo "Analysis SUCCEEDED"
             echo "Fetching analysis output response..."
             analysisOutputResponse=\$(icav2 projectanalyses output \$analysisId)
@@ -129,15 +132,15 @@ process checkAnalysisStatus {
             echo "Analysis output folder ID is '\${analysisOutputFolderId}'"
             break;
 
-        elif [ \${analysisStatus} == "FAILED" ]; then
+        elif [[ \${analysisStatus} == "FAILED" ]]; then
             echo "Analysis FAILED \n"
             break;
 
-        elif [ \${analysisStatus} == "FAILED_FINAL" ]; then
+        elif [[ \${analysisStatus} == "FAILED_FINAL" ]]; then
             echo "Analysis FAILED_FINAL"
             break;
 
-        elif [ \${analysisStatus} == "ABORTED" ]; then
+        elif [[ \${analysisStatus} == "ABORTED" ]]; then
             echo "Analysis ABORTED"
             break;
 
