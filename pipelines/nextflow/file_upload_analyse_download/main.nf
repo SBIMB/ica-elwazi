@@ -173,7 +173,7 @@ process downloadAnalysisOutput {
 
     echo "Downloading analysis output folder with ID '${analysisOutputFolderId}' to '${localDownloadPath}'..."
 
-    icav2 projectdata download ${analysisOutputFolderId} ${local_download_path}
+    icav2 projectdata download ${analysisOutputFolderId} ${localDownloadPath}
     """
 }
 
