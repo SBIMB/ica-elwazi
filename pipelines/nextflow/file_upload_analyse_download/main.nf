@@ -118,7 +118,7 @@ process checkAnalysisStatus {
     echo "Checking status of analysis with id '\${analysisId}' every ${analysisStatusCheckInterval} seconds, until status is 'SUCCEEDED'..."
     while true;
     do
-        ((\${StatusCheckCount}=\${StatusCheckCount}+1))
+        ((\${StatusCheckCount}+=1))
         updatedAnalysisResponse=\$(icav2 projectanalyses get \${analysisId})
 
         echo "Checking status of analysis with reference '\${analysisRef}'..."
