@@ -1,0 +1,11 @@
+{
+    "projectId": "049307d6-85dd-4cdc-b88d-a740e4e9e550",
+    "pipelineId": "bfecca03-6443-45bd-b313-e4f555cd0748",
+    "pipelineCode": "basic_pipeline",
+    "userReference": "regan_test_analysis_03",
+    "storageSize": "Small",
+    "analysisId": "387b5178-732f-4706-9c41-e67a0cd00dc6",
+    "analysisDataCode": "in",
+    "analysisStatusCheckInterval": 300,
+    "localDownloadPath": "/Users/regancannell/Documents/ica_data_downloads/"
+}

@@ -402,4 +402,6 @@ The bash script for the full process of uploading a single file, analysing it, a
 ![Single File Upload-Analyse-Download Script](public/assets/images/single_file_upload_analyse_download.png "Single File Upload-Analyse-Download Script") 
 
 The bash script for the full process of uploading a multiple files, analysing each one, and then downloading the output can be found in the [multiple_files_upload_analyse_download.sh](bash/multiple_files_upload_analyse_download.sh) script.   
-![Multiple Files Upload-Analyse-Download Script](public/assets/images/multiple_files_upload_analyse_download.png "Multiple Files Upload-Analyse-Download Script")  
+![Multiple Files Upload-Analyse-Download Script](public/assets/images/multiple_files_upload_analyse_download.png "Multiple Files Upload-Analyse-Download Script")    
+
+The Nextflow pipeline that implements the aforementioned bash scripts can be found over [here](pipelines/nextflow/file_upload_analyse_download/main.nf). This pipeline is still undergoing tests.
