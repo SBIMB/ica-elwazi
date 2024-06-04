@@ -25,17 +25,17 @@ icav2 config set
 There will be prompts. The defaults can be used by simply pressing `Enter` or `Return`. When the API key is prompted, provide the value that has been generated in the UI. 
 ```bash
 icav2 config set
-Creating /Users/regancannell/.icav2/config.yaml
+Creating $HOME/.icav2/config.yaml
 Initialize configuration settings [default]
 server-url [ica.illumina.com]: 
 x-api-key : myAPIKey
 output-format (allowed values table,yaml,json defaults to table) : 
 colormode (allowed values none,dark,light defaults to none) :
 ```
-The `/Users/regancannell/.icav2/config.yaml` file can be modified if the default settings are wished to be changed. In our case, our output format is JSON.   
+The `$HOME/.icav2/config.yaml` file can be modified if the default settings are wished to be changed. In our case, our output format is JSON.   
 
 Our goal is to create a process for the uploading of data to ICA, starting a pipeline run (or analysis) of the uploaded data, check the status of the analysis or output files periodically, download the results, and then finally clean up the storage in ICA (delete output and uploaded files). A diagram illustrating a single file upload-analysis-download-delete process can be seen below:   
-![Upload-Download ICA Process](public/assets/images/ica_upload_download_process.png "Upload-Download ICA Process")  
+![Upload-Download ICA Bash Process](public/assets/images/ica_upload_download_bash_process.png "Upload-Download ICA Bash Process")  
 
 ## Project and Project Data   
 A project can be created in the UI. After a project is created, the project object can be obtained by using the following CLI command:
@@ -44,11 +44,12 @@ projects=$(icav2 projects list)
 ```
 The response body will contain a JSON object with a list of existing projects. A single project object contains a lot of details about the project. (The object is too big to be displayed here).   
 
-To get the details of a specific project, the project id or name will be required. For example, we have a [script](bash/get_project_id.sh) in the `/bash` directory that extracts the `project_id` by using the `project_name` (which we create when creating a project).   
+To get the details of a specific project, the project id or name will be required. For example, we have a [script](bash/helper_scripts/get_project_id.sh) in the `/bash` directory that extracts the `project_id` by using the `project_name` (which we create when creating a project).   
 
 We make use of the [jq](https://jqlang.github.io/jq/) library (which is a JSON parser) in several of our scripts.   
 
 ## Uploading Files to Illumina Connected Analytics   
+### Uploading Single Files
 We can use the UI to upload a file to a project.   
 ![Uploading File using UI](public/assets/images/upload_file_using_ui.png "Uploading File using UI")
 
@@ -62,17 +63,17 @@ If the command runs successfully, then a response like
 ```
 should be received. Now the terminal session will be in the specified project's context. It's possible to now upload a file to the project with:
 ```bash
-icav2 projectdata upload <localFileFolder>
+icav2 projectdata upload </local/path/of/file>
 ```
 If a remote path for uploading is not specified, the data will be uploaded to the top level of the project's storage folder.   
 
 Without setting the project context, the `project_id` will need to be explicitly stated, i.e.
 ```bash
-icav2 projectdata upload <localFileFolder> --project-id <project_id>
+icav2 projectdata upload </local/path/of/file> --project-id <project_id>
 ```   
-Here is an example of uploading a file from the location `Documents/test_data/fastq/1_control_trnL_2019_minq7.fastq` and the JSON response received:   
+Here is an example of uploading a file from the location `Documents/ica_data_uploads/fastq/1_control_trnL_2019_minq7.fastq` and the JSON response received:   
 ```bash
-icav2 projectdata upload Documents/test_data/fastq/1_control_trnL_2019_minq7.fastq \ 
+icav2 projectdata upload Documents/ica_data_uploads/fastq/1_control_trnL_2019_minq7.fastq \ 
 --project-id 049307d6-85dd-4cdc-b88d-a740e4e9e550
 ```
 ![Upload Response](public/assets/images/icav2_upload_response.png "Upload Response")   
@@ -141,12 +142,32 @@ Notice that the JSON response contains an `"id"` key that begins with _"fil"_. W
 ```bash
 icav2 projectdata get <file-id> --project-id <project-id>
 ```   
-We have a [script](bash/get_uploaded_file_id.sh) in the `/bash` directory that extracts the `file_id` programmatically using certain `bash` commands.    
+We have a [script](bash/helper_scripts/get_uploaded_file_id.sh) in the `/bash` directory that extracts the `file_id` programmatically using certain `bash` commands.    
 
+### Uploading Multiple Files or A Folder
 To upload multiple files, we can use the following command:
 ```bash
 find $source -name '*.fastq.gz' | xargs -n 1 -P 10 -I {} icav2 projectdata upload {} /$target/
 ```
+To upload a folder, we can use the following command:
+```bash
+icav2 projectdata upload </local/path/of/folder> --project-id <projectId>
+```
+The response from this process will allows us to extract the `folderId` and `folderUploadSessionId`. We can then use these parameters to get details of the folder upload session, i.e.   
+```bash
+icav2 projectdata folderuploadsession --project-id <projectId> <folderId> <folderUploadSessionId>
+```
+
+## Creating Samples   
+A sample allows us to group our resources together so that further actions can be performed in a more systematic manner. We can create a sample with the CLI using the following command:
+```bash
+icav2 projectsamples create $sample_name \
+    --project-id $project_id \
+    --description $sample_description \
+    --user-tag $sample_user_tag \
+    --technical-tag $sample_technical_tag
+```
+The script [create_project_sample.sh](bash/helper_scripts/create_project_sample.sh) contains the logic for creating a project sample. Once a sample is created, we can link it to an existing project (in addition to the project to which it already belongs). We can also upload files or folders to a sample.
 
 ## Creating and Listing Nextflow Pipelines   
 A Nextflow pipeline can be created in the web UI. A tutorial on creating a Nextflow pipeline and running an analysis through the web UI can be found over [here](https://help.ica.illumina.com/tutorials/nextflow). The pipeline can also be created using the CLI with the following command:
@@ -320,7 +341,7 @@ icav2 projectpipelines start nextflow $pipeline_id \
 	--storage-size $storage_size \
 	--input $file_ref
 ```
-The `$file_ref` variable is constructed from the analysis code and the file id as `analysisCode:fileId`. The script for the more detailed process is [start_nextflow_pipeline_analysis.sh](bash/start_nextflow_pipeline_analysis.sh).   
+The `$file_ref` variable is constructed from the analysis code and the file id as `analysisCode:fileId`. The script for the more detailed process is [start_nextflow_pipeline_analysis.sh](bash/helper_scripts/start_nextflow_pipeline_analysis.sh).   
 
 ## Polling the Status of a Pipeline Run (or Analysis)   
 We would like to download the output files after the analysis is complete and successful, i.e. the status should be **"SUCCEEDED"**. The possible values are:
@@ -337,7 +358,7 @@ We would like to download the output files after the analysis is complete and su
 - FAILED_FINAL 
 - ABORTED   
 
-We can use a simple polling mechanism to keep checking the status of the analysis. When the status of the analysis is **SUCCEEDED**, then we can proceed to download the data. If the status is any one of **FAILED**, **FAILED_FINAL**, or **ABORTED**, then the polling `bash` script should be terminated. The [get_projectanalysis_status_by_user_reference.sh](bash/get_projectanalysis_status_by_user_reference.sh) script checks the status of a running analysis periodically (the time interval can be set by the developer). Here is a screenshot of an example of its implementation:    
+We can use a simple polling mechanism to keep checking the status of the analysis. When the status of the analysis is **SUCCEEDED**, then we can proceed to download the data. If the status is any one of **FAILED**, **FAILED_FINAL**, or **ABORTED**, then the polling `bash` script should be terminated. The [get_projectanalysis_status_by_user_reference.sh](bash/helper_scripts/get_projectanalysis_status_by_user_reference.sh) script checks the status of a running analysis periodically (the time interval can be set by the developer). Here is a screenshot of an example of its implementation:    
 
 ![Polling the Analysis Status](public/assets/images/polling_the_analysis_status.png "Polling the Analysis Status")   
 
@@ -351,21 +372,34 @@ As mentioned above, we would like to trigger a download process as soon as the s
 Files can be downloaded from the ICA storage using the CLI with the following CLI command:
 ```bash
 icav2 projectdata list # take note of the sourcePath
-icav2 projectdata download <sourcePath> <targetPath>
+icav2 projectdata download <sourcePath or dataId> <targetPath>
 ```
-The script [download_file_by_path.sh](bash/download_file_by_path.sh) can be tested with some test data. A successful implementation of this download script should look as follows:   
+The script [download_file_by_path.sh](bash/helper_scripts/download_file_by_path.sh) can be tested with some test data. A successful implementation of this download script should look as follows:   
 
 ![Download File from ICA Storage](public/assets/images/successful_download_script.png "Download File from ICA Storage")   
 
-## Delete Output File   
+## Delete Output File/Folder   
 To delete a file from a project, the following CLI command can be used:
 ```bash
 icav2 projectdata delete <path> --project-id <project_id>
 ```
-The script [delete_file_by_path.sh](bash/delete_file_by_path.sh) extracts the path of the file in the ICA storage and then proceeds to delete the file. Below is a screenshot of the process completed successfully:   
-![Delete File from ICA Storage](public/assets/images/delete_file_by_path_script.png "Delete File from ICA Storage")   
+The script [delete_file_by_path.sh](bash/helper_scripts/delete_file_by_path.sh) extracts the path of the file in the ICA storage and then proceeds to delete the file. Below is a screenshot of the process completed successfully:   
+![Delete File from ICA Storage](public/assets/images/delete_file_by_path_script.png "Delete File from ICA Storage")  
+
+Deleting a folder follows the same logic as deleting a file. For instance, the following command would delete a folder by its path in the ICA storage:
+```bash
+icav2 projectdata delete $folder_ica_storage_path --project-id $project_id
+```
+The script [delete_folder_by_path](bash/helper_scripts/delete_folder_by_path.sh) contains logic for extracting the folder path by filtering a list of project data by the folder name. The folder path is then used to delete the folder.   
+![Delete Folder from ICA Storage](public/assets/images/delete_folder_by_path_script.png "Delete Folder from ICA Storage")  
 
 ## Single File Upload-Analyse-Download Process 
 The entire process is to be run with `bash` commands in a Nextflow pipeline (not to be confused with the Nextflow pipeline that resides in the ICA and that will perform the analysis).   
 
-![ICA Upload-Analyse-Download Bash Process](public/assets/images/ica_upload_analyse_download_bash_process.png "ICA Upload-Analyse-Download Bash Process")   
+![ICA Upload-Analyse-Download Bash Process](public/assets/images/ica_upload_analyse_download_bash_process.png "ICA Upload-Analyse-Download Bash Process")    
+
+The bash script for the full process of uploading a single file, analysing it, and then downloading its output can be found in the [single_file_upload_analyse_download.sh](bash/single_file_upload_analyse_download.sh) script.    
+![Single File Upload-Analyse-Download Script](public/assets/images/single_file_upload_analyse_download.png "Single File Upload-Analyse-Download Script") 
+
+The bash script for the full process of uploading a multiple files, analysing each one, and then downloading the output can be found in the [multiple_files_upload_analyse_download.sh](bash/multiple_files_upload_analyse_download.sh) script.   
+![Multiple Files Upload-Analyse-Download Script](public/assets/images/multiple_files_upload_analyse_download.png "Multiple Files Upload-Analyse-Download Script")  

@@ -15,7 +15,7 @@ if [[ $? != 0 ]]; then
     printf "Failed to fetch projectanalyses list. \n"
     exit 1
 else
-    analysis_id=$(echo $projectanalyses_response | jq -r ".items[] | select(.userReference == \"$user_reference\").id")
+    analysis_id=$(echo $projectanalyses_list_response | jq -r ".items[] | select(.userReference == \"$user_reference\").id")
     printf "Fetching project analysis with id '$analysis_id'... \n"
     analysis_response=$(icav2 projectanalyses input $analysis_id)
     if [[ $? != 0 ]]; then

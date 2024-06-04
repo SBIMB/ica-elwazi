@@ -1,9 +1,9 @@
 #!/bin/bash
 
 file_name="NZ_GG704942.fa"
-file_path="Documents/test_data/fasta/NZ_GG704942.fa"
+file_path="Documents/ica_data_uploads/fasta/NZ_GG704942.fa"
 project_id="049307d6-85dd-4cdc-b88d-a740e4e9e550"
-time_stamp=$(date +"%Y-%m-%d_%H-%M-%S")
+time_stamp=$(date +"%Y-%m-%d_%H:%M:%S")
 
 printf "Checking if file exists at path '$file_path'... \n"
 
