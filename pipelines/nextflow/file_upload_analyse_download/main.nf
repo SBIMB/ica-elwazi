@@ -121,7 +121,7 @@ process checkAnalysisStatus {
         updatedAnalysisResponse=\$(icav2 projectanalyses get \${analysisId})
 
         echo "Checking status of analysis with reference '\${analysisRef}'..."
-        analysisStatus=\$(echo \${updatedAnalysisResponse} | jq -r ".items[] | select(.reference == "\${analysisRef}").status")
+        analysisStatus=\$(echo \${updatedAnalysisResponse} | jq -r ".status")
         echo "Current status of analysis is '\${analysisStatus}'..."
 
         if [[ \${analysisStatus} == "SUCCEEDED" ]]; then
