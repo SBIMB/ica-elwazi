@@ -96,7 +96,7 @@ process checkAnalysisStatus {
     debug true
     
     input:
-    val(analysisResponse)
+    path(analysisResponse)
     val(analysisStatusCheckInterval)
 
     output:
@@ -183,7 +183,7 @@ workflow {
 
     startAnalysis(checkFileUploadStatus.out.fileRef)
 
-    checkAnalysisStatus(startAnalysis.out.analysisResponse.view(), params.analysisStatusCheckInterval)
+    checkAnalysisStatus(startAnalysis.out.analysisResponse, params.analysisStatusCheckInterval)
 
     downloadAnalysisOutput(checkAnalysisStatus.out.analysisOutputFolderId.view(), params.localDownloadPath)
 }
