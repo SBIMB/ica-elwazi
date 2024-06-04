@@ -8,6 +8,7 @@ pipelineCode = params.pipelineCode
 userReference = params.userReference
 storageSize = params.storageSize
 analysisStatusCheckInterval = params.analysisStatusCheckInterval
+localDownloadPath = params.localDownloadPath
 
 process uploadFile {
     debug true
@@ -117,7 +118,7 @@ process checkAnalysisStatus {
     echo "Checking status of analysis with id '\${analysisId}' every ${analysisStatusCheckInterval} seconds, until status is 'SUCCEEDED'..."
     while true;
     do
-        ((\${StatusCheckCount}+=1))
+        ((\${StatusCheckCount}=\${StatusCheckCount}+1))
         updatedAnalysisResponse=\$(icav2 projectanalyses get \${analysisId})
 
         echo "Checking status of analysis with reference '\${analysisRef}'..."
