@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
-filePath = Channel.fromPath("NZ_GG704948.fa", checkIfExists: true)
 projectId = params.projectId
 analysisDataCode = params.analysisDataCode
 pipelineId = params.pipelineId
@@ -9,6 +8,7 @@ userReference = params.userReference
 storageSize = params.storageSize
 fileUploadStatusCheckInterval = params.fileUploadStatusCheckInterval
 analysisStatusCheckInterval = params.analysisStatusCheckInterval
+localUploadPath = params.localUploadPath
 localDownloadPath = params.localDownloadPath
 
 process uploadFile {
@@ -149,7 +149,9 @@ process checkAnalysisStatus {
 
         echo "Checking status of analysis with reference '\${analysisRef}'..."
         analysisStatus=\$(echo \${updatedAnalysisResponse} | jq -r ".status")
-        echo "Current status of analysis is '\${analysisStatus}'..."
+
+        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+        echo [\${timeStamp}]: Current status of analysis is '\${analysisStatus}'..."
 
         if [[ \${analysisStatus} == "SUCCEEDED" ]]; then
             echo "Analysis SUCCEEDED"
@@ -176,6 +178,7 @@ process checkAnalysisStatus {
 
         elif [[ \${analysisStatusCheckCount} -gt \${analysisStatusCheckLimit} ]]; then
             echo "Analysis status has been checked more than \${analysisStatusCheckLimit} times. Stopping..."
+            break;
 
         else
             echo "Analysis still in progress..."
@@ -241,6 +244,8 @@ process deleteData {
 }
 
 workflow {
+    filePath = Channel.fromPath(params.localUploadPath, checkIfExists: true)
+
     uploadFile(filePath, params.projectId)
     
     constructFileReference(uploadFile.out.fileUploadResponse.view(), params.analysisDataCode)
