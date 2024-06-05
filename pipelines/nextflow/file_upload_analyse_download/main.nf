@@ -229,6 +229,7 @@ process deleteData {
 
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
     echo "[\${timeStamp}]: Deleting uploaded file with ID '\${fileId}'..."
+    icav2 projectdata delete \${fileId}
 
     folderId=\$(cat ${outputFolderId})
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
