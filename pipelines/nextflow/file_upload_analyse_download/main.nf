@@ -1,12 +1,13 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
-filePath = Channel.fromPath("NZ_GG704945.fa", checkIfExists: true)
+filePath = Channel.fromPath("NZ_GG704948.fa", checkIfExists: true)
 projectId = params.projectId
 analysisDataCode = params.analysisDataCode
 pipelineId = params.pipelineId
 pipelineCode = params.pipelineCode
 userReference = params.userReference
 storageSize = params.storageSize
+fileUploadStatusCheckInterval = params.fileUploadStatusCheckInterval
 analysisStatusCheckInterval = params.analysisStatusCheckInterval
 localDownloadPath = params.localDownloadPath
 
@@ -23,8 +24,8 @@ process uploadFile {
     fileName = filePath.baseName
     """
     #!/bin/bash
-
-    echo "Uploading file '${fileName}' to project with id '${projectId}'..."
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Uploading file '${fileName}' to project with id '${projectId}'..."
 
     touch ${fileName}.txt
 
@@ -36,7 +37,7 @@ process uploadFile {
     """
 }
 
-process checkFileUploadStatus {
+process constructFileReference {
     debug true
     
     input:
@@ -51,15 +52,38 @@ process checkFileUploadStatus {
     """
     #!/bin/bash
     
+    fileUploadStatusCheckCount=0
+    fileUploadStatusCheckLimit=10
+    fileUploadStatus="PARTIAL"
+
     fileId=\$(cat ${fileUploadResponse} | grep -i '\"id\": \"fil' | grep -o 'fil.[^\"]*')
 
-    fileReference="${analysisDataCode}:\${fileId}"
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Checking status of uploaded file with id '\${fileId}' every ${fileUploadStatusCheckInterval} seconds, until status is 'AVAILABLE'..."
+    while true;
+    do
+        ((\${fileUploadStatusCheckCount}+=1))
+        uploadedFileResponse=\$(icav2 projectdata get \${fileId})
 
-    echo "File Reference:\${fileReference}"
+        echo "Checking status of file with id '\${fileId}'..."
+        fileUploadStatus=\$(echo \${uploadedFileResponse} | jq -r ".details.status")
 
-    touch fileReference.txt
-
-    echo "\${fileReference}" > fileReference.txt
+        echo "Current status of uploaded file is '\${fileUploadStatus}'."
+        if [[ \${fileUploadStatus} == "AVAILABLE" ]]; then
+            echo "Uploaded file is AVAILABLE"
+            fileReference="${analysisDataCode}:\${fileId}"
+            echo "File Reference:\${fileReference}"
+            touch fileReference.txt
+            echo "\${fileReference}" > fileReference.txt
+            break;
+        elif [[ \${fileUploadStatusCheckCount} -gt \${fileUploadStatusCheckLimit} ]]; then
+            echo "Uploaded file status has been checked more than \${fileUploadStatusCheckLimit} times. Stopping..."
+            break;
+        else
+            echo "Uploaded file is still not AVAILABLE. Checking again..."
+        fi
+        sleep ${fileUploadStatusCheckInterval};
+    done
     """
 }
 
@@ -77,7 +101,8 @@ process startAnalysis {
 
     """
     #!/bin/bash
-    echo "Starting Nextflow analysis..."
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Starting Nextflow analysis..."
 
     fileReference=\$(cat ${fileRef})
 
@@ -101,7 +126,7 @@ process checkAnalysisStatus {
     val(analysisStatusCheckInterval)
 
     output:
-    val analysisOutputFolderId, emit: analysisOutputFolderId
+    path "analysisOutputFolderId.txt", emit: analysisOutputFolderId
 
     script:
     analysisOutputFolderId = ""
@@ -115,7 +140,8 @@ process checkAnalysisStatus {
     analysisId=\$(cat ${analysisResponse} | jq -r ".id")
     analysisRef=\$(cat ${analysisResponse} | jq -r ".reference")
     
-    echo "Checking status of analysis with id '\${analysisId}' every ${analysisStatusCheckInterval} seconds, until status is 'SUCCEEDED'..."
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Checking status of analysis with id '\${analysisId}' every ${analysisStatusCheckInterval} seconds, until status is 'SUCCEEDED'..."
     while true;
     do
         ((\${StatusCheckCount}+=1))
@@ -131,6 +157,9 @@ process checkAnalysisStatus {
             analysisOutputResponse=\$(icav2 projectanalyses output \$analysisId)
             analysisOutputFolderId=\$(echo \${analysisOutputResponse} | jq -r ".items[].data[].dataId")
             echo "Analysis output folder ID is '\${analysisOutputFolderId}'"
+
+            touch analysisOutputFolderId.txt
+            echo "\${analysisOutputFolderId}" > analysisOutputFolderId.txt
             break;
 
         elif [[ \${analysisStatus} == "FAILED" ]]; then
@@ -161,30 +190,65 @@ process downloadAnalysisOutput {
     debug true
     
     input:
-    val(analysisOutputFolderId)
+    path(analysisOutputFolderId)
     val(localDownloadPath)
+
+    output:
+    path "outputFolderId.txt", emit: outputFolderId
+
+    script:
+    outputFolderId = ""
+    """
+    #!/bin/bash
+
+    outputFolderId=\$(cat ${analysisOutputFolderId})
+
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Downloading analysis output folder with ID '\${outputFolderId}' to '${localDownloadPath}'..."
+
+    icav2 projectdata download \${outputFolderId} ${localDownloadPath}
+
+    touch outputFolderId.txt
+    echo "\${outputFolderId}" > outputFolderId.txt
+    """
+}
+
+process deleteData {
+    debug true
+
+    input:
+    path(fileUploadResponse)
+    path(outputFolderId)
 
     output:
     stdout
 
     script:
     """
-    #!/bin/bash
+    fileId=\$(cat ${fileUploadResponse} | grep -i '\"id\": \"fil' | grep -o 'fil.[^\"]*')
 
-    echo "Downloading analysis output folder with ID '${analysisOutputFolderId}' to '${localDownloadPath}'..."
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Deleting uploaded file with ID '\${fileId}'..."
 
-    icav2 projectdata download ${analysisOutputFolderId} ${localDownloadPath}
+    folderId=\$(cat ${outputFolderId})
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[\${timeStamp}]: Deleting analysis output folder with ID '\${folderId}'..."
+    icav2 projectdata delete \${folderId}
+
+    echo "Uploaded file and analysis output folder successfully deleted."
     """
 }
 
 workflow {
     uploadFile(filePath, params.projectId)
     
-    checkFileUploadStatus(uploadFile.out.fileUploadResponse.view(), params.analysisDataCode)
+    constructFileReference(uploadFile.out.fileUploadResponse.view(), params.analysisDataCode)
 
-    startAnalysis(checkFileUploadStatus.out.fileRef)
+    startAnalysis(constructFileReference.out.fileRef)
 
     checkAnalysisStatus(startAnalysis.out.analysisResponse, params.analysisStatusCheckInterval)
 
-    downloadAnalysisOutput(checkAnalysisStatus.out.analysisOutputFolderId.view(), params.localDownloadPath)
+    downloadAnalysisOutput(checkAnalysisStatus.out.analysisOutputFolderId, params.localDownloadPath)
+
+    deleteData(uploadFile.out.fileUploadResponse.view(), downloadAnalysisOutput.out.outputFolderId)
 }
