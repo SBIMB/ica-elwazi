@@ -8,6 +8,6 @@
     "analysisDataCode": "in",
     "fileUploadStatusCheckInterval": 120,
     "analysisStatusCheckInterval": 300,
-    "localUploadPath": "/Users/regancannell/Documents/ica_data_uploads/fasta/multiple_fasta_files/NZ_GG704940.fa",
+    "localUploadPath": "/Users/regancannell/Documents/ica_data_uploads/fasta/multiple_fasta_files/*",
     "localDownloadPath": "/Users/regancannell/Documents/ica_data_downloads/"
 }
