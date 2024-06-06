@@ -151,7 +151,7 @@ process checkAnalysisStatus {
         analysisStatus=\$(echo \${updatedAnalysisResponse} | jq -r ".status")
 
         timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        echo [\${timeStamp}]: Current status of analysis is '\${analysisStatus}'..."
+        echo "[\${timeStamp}]: Current status of analysis is '\${analysisStatus}'..."
 
         if [[ \${analysisStatus} == "SUCCEEDED" ]]; then
             echo "Analysis SUCCEEDED"
