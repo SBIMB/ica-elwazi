@@ -1,3 +1,9 @@
 .DS_Store
 .env
-public/assets/ica_data_uploads
+public/assets/ica_data_uploads/*
+public/assets/ica_data_uploads/fasta
+public/assets/ica_data_uploads/fastq
+pipelines/nextflow/single_file_upload/.nextflow
+pipelines/nextflow/single_file_upload/ica_data_uploads
+pipelines/nextflow/single_file_upload/work
+pipelines/nextflow/single_file_upload/.nextflow.*
