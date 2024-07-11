@@ -1,0 +1,19 @@
+{
+    "projectId": "049307d6-85dd-4cdc-b88d-a740e4e9e550",
+    "pipelineId": "bfecca03-6443-45bd-b313-e4f555cd0748",
+    "pipelineCode": "basic_dragen_nextflow_pipeline",
+    "userReference": "regan_dragen_test_analysis_01",
+    "storageSize": "Small",
+    "analysisId": "387b5178-732f-4706-9c41-e67a0cd00dc6",
+    "analysisDataCode": "in",
+    "read1AnalysisDataCode": "read1",
+    "read2AnalysisDataCode": "read2",
+    "referenceAnalysisDataCode": "ref_tar",
+    "fileUploadStatusCheckInterval": 120,
+    "analysisStatusCheckInterval": 300,
+    "readsFileUploadPath": "/Users/regancannell/Documents/sbimb/ica-v2-poc/public/assets/ica_data_uploads/fastq/1_control_rbcLa_2019_minq7",
+    "readsPairFilesUploadPath": "/Users/regancannell/Documents/sbimb/ica-v2-poc/public/assets/ica_data_uploads/fastq/my_own_fastq_files/*_R{1,2}_001.fastq",
+    "referenceFileUploadPath": "/Users/regancannell/Documents/sbimb/ica-v2-poc/public/assets/ica_data_uploads/fastq/reference_files/reference_file.txt",
+    "localDownloadPath": "/Users/regancannell/Documents/ica_data_downloads/",
+    "icaUploadPath": "/fastq/my_own_fastq_files/"
+}
