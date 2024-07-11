@@ -1,5 +1,5 @@
 #!/bin/bash
-file_path="$HOME/Documents/RWCannell/ica-v2-poc/public/assets/ica_data_uploads/fasta/Yokenella_regensburgei_ATCC_43003_uid65133/NZ_AGCL00000000.scaffold.fa/NZ_JH417871.fa"
+file_path="$HOME/Documents/sbimb/ica-v2-poc/public/assets/ica_data_uploads/fasta/Yokenella_regensburgei_ATCC_43003_uid65133/NZ_AGCL00000000.scaffold.fa/NZ_JH417871.fa"
 project_id="049307d6-85dd-4cdc-b88d-a740e4e9e550"
 time_stamp=$(date +"%Y-%m-%d %H:%M:%S")
 
