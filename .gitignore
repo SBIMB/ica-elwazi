@@ -15,6 +15,10 @@ pipelines/nextflow/fastq_pairwise_upload_for_dragen/.nextflow
 pipelines/nextflow/fastq_pairwise_upload_for_dragen/ica_data_uploads
 pipelines/nextflow/fastq_pairwise_upload_for_dragen/work
 pipelines/nextflow/fastq_pairwise_upload_for_dragen/.nextflow.*
+pipelines/nextflow/fastq_dragen_analysis/.nextflow
+pipelines/nextflow/fastq_dragen_analysis/ica_data_uploads
+pipelines/nextflow/fastq_dragen_analysis/work
+pipelines/nextflow/fastq_dragen_analysis/.nextflow.*
 pipelines/nextflow/bam_file_upload_for_dragen/.nextflow
 pipelines/nextflow/bam_file_upload_for_dragen/ica_data_uploads
 pipelines/nextflow/bam_file_upload_for_dragen/work
