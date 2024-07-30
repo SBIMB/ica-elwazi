@@ -18,6 +18,5 @@
     "referenceFileUploadPath": "./ica_data_uploads/reference/reference.txt",
     "referenceFileIcaPath": "/Illumina DRAGEN v10 References/chm13_v2-cnv.hla.methylation_combined.rna_v4.tar.gz",
     "referenceFileId": "fil.2e3fd8d802ee4963da2208dc484ea8f0",
-    "localDownloadPath": "$HOME/ica_data_downloads/",
-    "icaUploadPath": "/fastq/my_own_fastq_files/"
+    "localDownloadPath": "$HOME/ica_data_downloads/"
 }
