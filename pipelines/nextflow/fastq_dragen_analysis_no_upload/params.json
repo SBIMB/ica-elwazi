@@ -1,0 +1,22 @@
+{
+    "projectId": "049307d6-85dd-4cdc-b88d-a740e4e9e550",
+    "pipelineId": "858708e9-6cdd-42ae-ad97-8b86ee07cdc5",
+    "pipelineCode": "DRAGEN Germline Whole Genome 4-3-6",
+    "userReference": "regan_dragen_germline_whole_genome_test_03",
+    "storageSize": "Medium",
+    "read1AnalysisDataCode": "read1",
+    "read2AnalysisDataCode": "read2",
+    "fastqsDataCode": "fastqs",
+    "referenceAnalysisDataCode": "ref_tar",
+    "referenceDirectory": "/scratch/reference",
+    "intermediateResultsDirectory": "/scratch",
+    "hashTableConfigFile": "/scratch/reference/hash_table.cfg",
+    "fileUploadStatusCheckInterval": 120,
+    "analysisStatusCheckInterval": 300,
+    "analysisStatusCheckLimit": 50,
+    "sampleId": "ERR1019034",
+    "read1FileId": "fil.7268e6810bb24d6b978d08dcaaee06d9",
+    "read2FileId": "fil.f1e95d34d124472f19bd08dcaac709b2",
+    "referenceFileId": "fil.2e3fd8d802ee4963da2208dc484ea8f0",
+    "localDownloadPath": "$HOME/ica_data_downloads/"
+}

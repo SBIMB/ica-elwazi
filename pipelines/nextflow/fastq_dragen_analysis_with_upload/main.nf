@@ -8,8 +8,12 @@ pipelineId = params.pipelineId
 pipelineCode = params.pipelineCode
 userReference = params.userReference
 storageSize = params.storageSize
+hashTableConfigFile = params.hashTableConfigFile
+referenceDirectory = params.referenceDirectory
+intermediateResultsDirectory = params.intermediateResultsDirectory
 fileUploadStatusCheckInterval = params.fileUploadStatusCheckInterval
 analysisStatusCheckInterval = params.analysisStatusCheckInterval
+analysisStatusCheckLimit = params.analysisStatusCheckLimit
 readsFileUploadPath = params.readsFileUploadPath
 readsPairFilesUploadPath = params.readsPairFilesUploadPath
 referenceFileUploadPath = params.referenceFileUploadPath
@@ -163,28 +167,36 @@ process startAnalysis {
     """
     #!/bin/bash
 
-    sample_id=\$(cat ${dataFile} | grep -E "sampleId")
+    sample_id=\$(cat ${dataFile} | grep -o 'sampleId:.*' | cut -f2- -d:)
+    read_1_file_id=\$(cat ${dataFile} | grep -o 'read1:.*' | cut -f2- -d:)
+    read_2_file_id=\$(cat ${dataFile} | grep -o 'read2:.*' | cut -f2- -d:)
 
-    read1_analysis_code=\$(cat ${dataFile} | grep -E "read1")
-    read2_analysis_code=\$(cat ${dataFile} | grep -E "read2")
+    read_1_analysis_code=\$(cat ${dataFile} | grep -E "read1")
+    read_2_analysis_code=\$(cat ${dataFile} | grep -E "read2")
     reference_analysis_code=\$(cat ${dataFile} | grep -E "ref_tar")
 
     output_directory="/output/${sampleId}/"
 
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
     printf "[\${timeStamp}]: Starting Nextflow analysis...\n"
-    analysisResponse=\$(icav2 projectpipelines start nextflow ${pipelineId} \
-        --user-reference ${userReference} \
-        --project-id ${projectId} \
-        --storage-size ${storageSize} \
-        --input \${read1_analysis_code} \
-        --input \${read2_analysis_code} \
+
+    analysisResponse=\$(icav2 projectpipelines start nextflow $pipelineId \
+        --user-reference $userReference \
+        --project-id $projectId \
+        --storage-size $storageSize \
         --input \${reference_analysis_code} \
-        --parameters enable-variant-caller:true \
-        --parameters RGID:Illumina_RGID \
-        --parameters RGSM:${sampleId} \
-        --parameters output-directory:\${output_directory} \
-        --parameters output-file-prefix:${sampleId}) 
+        --input fastqs:"\${read_1_file_id},\${read_2_file_id}" \
+        --parameters enable_map_align:true \
+        --parameters enable_map_align_output:true \
+        --parameters output_format:BAM \
+        --parameters enable_variant_caller:true \
+        --parameters vc_emit_ref_confidence:BP_RESOLUTION \
+        --parameters enable_cnv:false \
+        --parameters enable_sv:true \
+        --parameters repeat_genotype_enable:true \
+        --parameters enable_hla:false \
+        --parameters enable_variant_annotation:false \
+        --parameters output_file_prefix:"\${sample_id}")
 
     touch "analysisResponse.txt"
     echo "\${analysisResponse}" > analysisResponse.txt
@@ -207,8 +219,8 @@ process checkAnalysisStatus {
     #!/bin/bash
 
     analysis_status_check_count=0
-    analysis_status_check_limit=10
     analysis_status="REQUESTED"
+    touch analysisOutputFolderId.txt
 
     analysis_id=\$(cat ${analysisResponse} | jq -r ".id")
     analysis_ref=\$(cat ${analysisResponse} | jq -r ".reference")
@@ -233,7 +245,6 @@ process checkAnalysisStatus {
             analysisOutputFolderId=\$(echo \${analysisOutputResponse} | jq -r ".items[].data[].dataId")
             printf "Analysis output folder ID is '\${analysisOutputFolderId}'\n"
 
-            touch analysisOutputFolderId.txt
             echo "\${analysisOutputFolderId}" > analysisOutputFolderId.txt
             break;
 
@@ -249,8 +260,8 @@ process checkAnalysisStatus {
             printf "Analysis ABORTED\n"
             break;
 
-        elif [[ \${analysis_status_check_count} -gt \${analysis_status_check_limit} ]]; then
-            printf "Analysis status has been checked more than \${analysis_status_check_limit} times. Stopping...\n"
+        elif [[ \${analysis_status_check_count} -gt ${analysisStatusCheckLimit} ]]; then
+            printf "Analysis status has been checked more than ${analysisStatusCheckLimit} times. Stopping...\n"
             break;
 
         else
@@ -301,10 +312,10 @@ process deleteData {
 
     script:
     """
-    sample_id=$(cat data_file.txt | grep -o 'sampleId:.*' | cut -f2- -d:)
-    read_1_file_id=$(cat data_file.txt | grep -o 'read1:.*' | cut -f2- -d:)
-    read_2_file_id=$(cat data_file.txt | grep -o 'read2:.*' | cut -f2- -d:)
-    reference_file_id=$(cat data_file.txt | grep -o 'ref_tar:.*' | cut -f2- -d:)
+    sample_id=\$(cat data_file.txt | grep -o 'sampleId:.*' | cut -f2- -d:)
+    read_1_file_id=\$(cat data_file.txt | grep -o 'read1:.*' | cut -f2- -d:)
+    read_2_file_id=\$(cat data_file.txt | grep -o 'read2:.*' | cut -f2- -d:)
+    reference_file_id=\$(cat data_file.txt | grep -o 'ref_tar:.*' | cut -f2- -d:)
 
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
     printf "[\${timeStamp}]: Deleting uploaded read 1 file with ID '\${read_1_file_id}'...\n"
@@ -336,5 +347,5 @@ workflow {
     startAnalysis(uploadReferenceFile.out.dataFile)
     checkAnalysisStatus(startAnalysis.out.analysisResponse, params.analysisStatusCheckInterval)
     downloadAnalysisOutput(checkAnalysisStatus.out.analysisOutputFolderId, params.localDownloadPath)
-    deleteData(uploadFile.out.dataFile, downloadAnalysisOutput.out.outputFolderId)
+    deleteData(uploadReferenceFile.out.dataFile, downloadAnalysisOutput.out.outputFolderId)
 }
