@@ -3,6 +3,7 @@ nextflow.enable.dsl=2
 projectId = params.projectId
 read1AnalysisDataCode = params.read1AnalysisDataCode
 read2AnalysisDataCode = params.read2AnalysisDataCode
+fastqsAnalysisDataCode = params.fastqsAnalysisDataCode
 referenceAnalysisDataCode = params.referenceAnalysisDataCode
 pipelineId = params.pipelineId
 pipelineCode = params.pipelineCode
@@ -17,7 +18,6 @@ analysisStatusCheckLimit = params.analysisStatusCheckLimit
 readsFileUploadPath = params.readsFileUploadPath
 referenceFileId = params.referenceFileId
 readsPairFilesUploadPath = params.readsPairFilesUploadPath
-referenceFileUploadPath = params.referenceFileUploadPath
 localDownloadPath = params.localDownloadPath
 
 process uploadFastqFilePairs {
@@ -160,7 +160,7 @@ process startAnalysis {
         --project-id ${projectId} \
         --storage-size ${storageSize} \
         --input \${reference_analysis_code} \
-        --input fastqs:"\${read_1_file_id},\${read_2_file_id}" \
+        --input ${fastqsAnalysisDataCode}:"\${read_1_file_id},\${read_2_file_id}" \
         --parameters enable_map_align:true \
         --parameters enable_map_align_output:false \
         --parameters output_format:BAM \
@@ -224,22 +224,27 @@ process checkAnalysisStatus {
 
         if [[ \${analysis_status} == "SUCCEEDED" ]]; then
             printf "Analysis SUCCEEDED\n"
+            printf "analysisStatus:SUCCEEDED\n" >> ${dataFile}
             break;
 
         elif [[ \${analysis_status} == "FAILED" ]]; then
             printf "Analysis FAILED \n"
+            printf "analysisStatus:FAILED\n" >> ${dataFile}
             break;
 
         elif [[ \${analysis_status} == "FAILED_FINAL" ]]; then
             printf "Analysis FAILED_FINAL\n"
+            printf "analysisStatus:FAILED_FINAL\n" >> ${dataFile}
             break;
 
         elif [[ \${analysis_status} == "ABORTED" ]]; then
             printf "Analysis ABORTED\n"
+            printf "analysisStatus:ABORTED\n" >> ${dataFile}
             break;
 
         elif [[ \${analysis_status_check_count} -gt ${analysisStatusCheckLimit} ]]; then
             printf "Analysis status has been checked more than ${analysisStatusCheckLimit} times. Stopping...\n"
+            printf "analysisStatus:TIMEOUT\n" >> ${dataFile}
             break;
 
         else
@@ -315,7 +320,6 @@ process deleteData {
 
 workflow {
     fastqFilePairs = Channel.fromFilePairs(readsPairFilesUploadPath, checkIfExists:true)
-    referenceFilePath = Channel.fromPath(params.referenceFileUploadPath, checkIfExists: true)
 
     uploadFastqFilePairs(fastqFilePairs, params.projectId)
     getReferenceFile(uploadFastqFilePairs.out.dataFile)
