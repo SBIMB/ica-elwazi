@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file_path="$HOME/Documents/sbimb/ica-v2-poc/public/assets/ica_data_uploads/fastq/1_control_rbcLa_2019_minq7"
+file_path="$HOME/Documents/RWCannell/ica-v2-poc/public/assets/ica_data_uploads/fastq/1_control_rbcLa_2019_minq7"
 project_id="049307d6-85dd-4cdc-b88d-a740e4e9e550"
 time_stamp=$(date +"%Y-%m-%d %H:%M:%S")
 
