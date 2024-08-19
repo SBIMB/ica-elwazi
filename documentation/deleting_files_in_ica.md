@@ -10,4 +10,4 @@ Deleting a folder follows the same logic as deleting a file. For instance, the f
 ```bash
 icav2 projectdata delete $folder_ica_storage_path --project-id $project_id
 ```
-The script [delete_folder_by_path](bash/helper_scripts/delete_folder_by_path.sh) contains logic for extracting the folder path by filtering a list of project data by the folder name. The folder path is then used to delete the folder.    
+The script [delete_folder_by_path](./../bash/helper_scripts/delete_folder_by_path.sh) contains logic for extracting the folder path by filtering a list of project data by the folder name. The folder path is then used to delete the folder.    

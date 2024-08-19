@@ -106,4 +106,4 @@ icav2 projectdata upload </local/path/of/folder> --project-id <projectId>
 The response from this process will allows us to extract the `folderId` and `folderUploadSessionId`. We can then use these parameters to get details of the folder upload session, i.e.   
 ```bash
 icav2 projectdata folderuploadsession --project-id <projectId> <folderId> <folderUploadSessionId>
-```  
+```
