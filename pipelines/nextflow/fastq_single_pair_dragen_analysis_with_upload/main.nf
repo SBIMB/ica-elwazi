@@ -375,7 +375,12 @@ process deleteData {
     printf "[\${timeStamp}]: Deleting analysis output folder with ID '\${analysis_output_folder_id}'...\n"
     icav2 projectdata delete \${analysis_output_folder_id}
 
-    printf "Uploaded file and analysis output folder successfully deleted.\n"
+    ica_upload_path="/fastq/\${sample_id}/"
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Deleting folder containing pair of FASTQ files with path '\${ica_upload_path}'...\n"
+    icav2 projectdata delete \${ica_upload_path} --project-id ${projectId}
+
+    printf "Uploaded files and analysis output folder successfully deleted.\n"
     """
 }
 

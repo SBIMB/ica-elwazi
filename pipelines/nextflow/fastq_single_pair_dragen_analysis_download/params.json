@@ -8,6 +8,7 @@
     "analysisStatusCheckInterval": 300,
     "analysisStatusCheckLimit": 50,
     "analysisId": "246203f6-bc91-4598-b713-cee0e688a5f4",
+    "sampleId": "ERR1019052",
     "read1FileId": "fil.b1071eec05c74357097308dcb50024bc",
     "read2FileId": "fil.6ab632f0e10f432ad8b308dc954b73dc",
     "readsFileUploadPath": "/dataG/SGDVP/ERR1019052/*",

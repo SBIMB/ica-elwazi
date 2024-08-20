@@ -8,6 +8,7 @@ storageSize = params.storageSize
 fileUploadStatusCheckInterval = params.fileUploadStatusCheckInterval
 analysisStatusCheckInterval = params.analysisStatusCheckInterval
 analysisStatusCheckLimit = params.analysisStatusCheckLimit
+sampleId = params.sampleId
 read1FileId = params.read1FileId
 read2FileId = params.read2FileId
 analysisId = params.analysisId
@@ -39,6 +40,7 @@ process createDataFile {
     printf "[\${time_stamp}]: "
     printf "Writing file data to existing data file...\n"
 
+    printf "sampleId:${sampleId}\n" >> \${data_file}
     printf "read1:${read1FileId}\n" >> \${data_file}
     printf "read2:${read2FileId}\n" >> \${data_file}
     printf "analysisId:${analysisId}\n" >> \${data_file}
@@ -79,24 +81,33 @@ process checkAnalysisStatus {
 
         if [[ \${analysis_status} == "SUCCEEDED" ]]; then
             printf "Analysis SUCCEEDED\n"
+            printf "analysisStatus:\${analysis_status}\n" >> ${dataFile}
+            printf "\${while_loop_completion_message}\n"
             break;
 
         elif [[ \${analysis_status} == "FAILED" ]]; then
             printf "Analysis FAILED \n"
-            break;
+            printf "analysisStatus:\${analysis_status}\n" >> ${dataFile}
+            printf "\${while_loop_completion_message}\n"
+            exit 1
 
         elif [[ \${analysis_status} == "FAILED_FINAL" ]]; then
             printf "Analysis FAILED_FINAL\n"
-            break;
+            printf "analysisStatus:\${analysis_status}\n" >> ${dataFile}
+            printf "\${while_loop_completion_message}\n"
+            exit 1
 
         elif [[ \${analysis_status} == "ABORTED" ]]; then
             printf "Analysis ABORTED\n"
-            break;
+            printf "analysisStatus:\${analysis_status}\n" >> ${dataFile}
+            printf "\${while_loop_completion_message}\n"
+            exit 1
 
         elif [[ \${analysis_status_check_count} -gt ${analysisStatusCheckLimit} ]]; then
             printf "Analysis status has been checked more than ${analysisStatusCheckLimit} times. Stopping...\n"
             printf "analysisStatus:TIMEOUT\n" >> ${dataFile}
-            break;
+            printf "\${while_loop_completion_message}\n"
+            exit 1
 
         else
             printf "Analysis still in progress...\n"
@@ -104,10 +115,6 @@ process checkAnalysisStatus {
 
         sleep ${analysisStatusCheckInterval};
     done
-
-    printf "analysisStatus:\${analysis_status}\n" >> ${dataFile}
-
-    printf "\${while_loop_completion_message}\n"
     """
 }
 
@@ -153,6 +160,7 @@ process deleteData {
 
     script:
     """
+    sample_id=\$(cat ${dataFile} | grep -o 'sampleId:.*' | cut -f2- -d:)
     read_1_file_id=\$(cat ${dataFile} | grep -o 'read1:.*' | cut -f2- -d:)
     read_2_file_id=\$(cat ${dataFile} | grep -o 'read2:.*' | cut -f2- -d:)
     analysis_output_folder_id=\$(cat ${dataFile} | grep -o 'outputFolderId:.*' | cut -f2- -d:)
@@ -170,6 +178,12 @@ process deleteData {
         printf "[\${timeStamp}]: Deleting analysis output folder with ID '\${analysis_output_folder_id}'...\n"
         icav2 projectdata delete \${analysis_output_folder_id}
     fi
+
+    ica_upload_path="/fastq/\${sample_id}/"
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Deleting folder containing pair of FASTQ files with path '\${ica_upload_path}'...\n"
+    icav2 projectdata delete \${ica_upload_path} --project-id ${projectId}
+
     printf "Uploaded file and analysis output folder successfully deleted.\n"
     """
 }
