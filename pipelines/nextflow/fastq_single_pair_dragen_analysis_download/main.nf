@@ -175,16 +175,8 @@ process deleteData {
 }
 
 workflow {
-    // dataFilePath = Channel.fromPath("${projectDir}/data.txt", checkIfExists: true)
     createDataFile()
-    // def dataFileChannel = createDataFile.out.dataFile
-    def dataFileChannel = Channel.fromPath("${projectDir}/data.txt")
-    dataFileChannel.view()
-
-    println "dataFileChannel: ${dataFileChannel}"
-
     checkAnalysisStatus(createDataFile.out.dataFile)
-
     downloadAnalysisOutput(checkAnalysisStatus.out.dataFile)
     deleteData(downloadAnalysisOutput.out.dataFile)
 }

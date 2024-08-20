@@ -7,6 +7,7 @@
     "read1AnalysisDataCode": "read1",
     "read2AnalysisDataCode": "read2",
     "fastqsAnalysisDataCode": "fastqs",
+    "fastqListDataCode": "fastq_list",
     "referenceAnalysisDataCode": "ref_tar",
     "intermediateResultsDirectory": "/scratch",
     "referenceDirectory": "/scratch/reference",

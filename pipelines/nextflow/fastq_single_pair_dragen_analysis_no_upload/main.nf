@@ -3,6 +3,7 @@ nextflow.enable.dsl=2
 projectId = params.projectId
 read1AnalysisDataCode = params.read1AnalysisDataCode
 read2AnalysisDataCode = params.read2AnalysisDataCode
+fastqListDataCode = params.fastqListDataCode
 referenceAnalysisDataCode = params.referenceAnalysisDataCode
 pipelineId = params.pipelineId
 pipelineCode = params.pipelineCode
@@ -16,6 +17,7 @@ analysisStatusCheckLimit = params.analysisStatusCheckLimit
 sampleId = params.sampleId
 read1FileId = params.read1FileId
 read2FileId = params.read2FileId
+fastqListFileId = params.fastqListFileId
 fastqsDataCode = params.fastqsDataCode
 referenceFileId = params.referenceFileId
 localDownloadPath = params.localDownloadPath
@@ -38,6 +40,9 @@ process checkFileStatus {
     read_2_file_data_response=\$(icav2 projectdata get ${read2FileId})
     read_2_file_status=\$(echo \${read_2_file_data_response} | jq -r ".details.status")
 
+    fastq_list_file_data_response=\$(icav2 projectdata get ${fastqListFileId})
+    fastq_list_file_status=\$(echo \${fastq_list_file_data_response} | jq -r ".details.status")
+
     reference_file_data_response=\$(icav2 projectdata get ${referenceFileId})
     reference_file_status=\$(echo \${reference_file_data_response} | jq -r ".details.status")
 
@@ -46,6 +51,7 @@ process checkFileStatus {
         read_1_analysis_code="${read1AnalysisDataCode}:${read1FileId}"
     else
         printf "Read 1 file is not AVAILABLE\n"
+        exit 1
     fi
 
     if [[ \${read_2_file_status} == "AVAILABLE" ]]; then
@@ -53,6 +59,15 @@ process checkFileStatus {
         read_2_analysis_code="${read2AnalysisDataCode}:${read2FileId}"
     else
         printf "Read 2 file is not AVAILABLE\n"
+        exit 1
+    fi
+
+    if [[ \${fastq_list_file_status} == "AVAILABLE" ]]; then
+        printf "FASTQ list file is AVAILABLE\n"
+        fastq_list_analysis_code="${fastqListDataCode}:${fastqListFileId}"
+    else
+        printf "FASTQ list file is not AVAILABLE\n"
+        exit 1
     fi
 
     if [[ \${reference_file_status} == "AVAILABLE" ]]; then
@@ -60,6 +75,7 @@ process checkFileStatus {
         reference_file_analysis_code="${referenceAnalysisDataCode}:${referenceFileId}"
     else
         printf "Reference file is not AVAILABLE\n"
+        exit 1
     fi
 
     data_file="data.txt"
@@ -107,12 +123,15 @@ process startAnalysis {
         --project-id ${projectId} \
         --storage-size ${storageSize} \
         --input \${reference_analysis_code} \
-        --input fastqs:"\${read_1_file_id},\${read_2_file_id}" \
+        --input ${fastqsDataCode}:"\${read_1_file_id},\${read_2_file_id}" \
+        --input ${fastqListDataCode}:${fastqListFileId} \
         --parameters enable_map_align:true \
-        --parameters enable_map_align_output:false \
-        --parameters output_format:BAM \
+        --parameters enable_map_align_output:true \
+        --parameters output_format:CRAM \
+        --parameters enable_duplicate_marking:true \
         --parameters enable_variant_caller:true \
         --parameters vc_emit_ref_confidence:BP_RESOLUTION \
+        --parameters vc_enable_vcf_output:true \
         --parameters enable_cnv:false \
         --parameters enable_sv:false \
         --parameters repeat_genotype_enable:false \
