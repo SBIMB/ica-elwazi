@@ -1,0 +1,26 @@
+{
+    "projectId": "049307d6-85dd-4cdc-b88d-a740e4e9e550",
+    "pipelineId": "858708e9-6cdd-42ae-ad97-8b86ee07cdc5",
+    "pipelineCode": "DRAGEN Germline Whole Genome 4-3-6",
+    "userReference": "dragen_germline_whole_genome",
+    "storageSize": "Medium",
+    "read1AnalysisDataCode": "read1",
+    "read2AnalysisDataCode": "read2",
+    "fastqsAnalysisDataCode": "fastqs",
+    "fastqListDataCode": "fastq_list",
+    "referenceAnalysisDataCode": "ref_tar",
+    "intermediateResultsDirectory": "/scratch",
+    "referenceDirectory": "/scratch/reference",
+    "hashTableConfigFile": "/scratch/reference/hash_table.cfg",
+    "fileStatusCheckInterval": 120,
+    "fileStatusCheckLimit": 10,
+    "analysisStatusCheckInterval": 300,
+    "analysisStatusCheckLimit": 100,
+    "readsFileUploadPath": "/home/regan/ica_data_uploads/*",
+    "readsPairFilesUploadPath": "/home/regan/ica_data_uploads/dragen_batch_of_three_04/**/*_{1,2}.fastq.gz",
+    "referenceFileUploadPath": "./ica_data_uploads/reference/chm13_v2-cnv.hla.methylated_combined.rna-10-r4.0-1.tar.gz",
+    "referenceFileIcaPath": "/Illumina DRAGEN v10 References/chm13_v2-cnv.hla.methylation_combined.rna_v4.tar.gz",
+    "referenceFileId": "fil.2e3fd8d802ee4963da2208dc484ea8f0",
+    "localDownloadPath": "/home/regan/ica_data_downloads"
+}
+
