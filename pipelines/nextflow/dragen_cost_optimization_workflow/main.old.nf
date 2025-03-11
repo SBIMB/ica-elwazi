@@ -47,17 +47,13 @@ process uploadFastqFilePairs {
 
     printf "[\${time_stamp}]: "
     printf "Uploading read 1 file '${read_1_file}'... \n"
-    read_1_upload_response=\$(icav2 projectdata upload ${read_1_file} --project-id ${projectId} &)
-    P1=$!
+    read_1_upload_response=\$(icav2 projectdata upload ${read_1_file} --project-id ${projectId})
     echo "\${read_1_upload_response}" > \${read_1_file_response}
 
     printf "[\${time_stamp}]: "
     printf "Uploading read 2 file '${read_2_file}'... \n"
-    read_2_upload_response=\$(icav2 projectdata upload ${read_2_file} --project-id ${projectId} &)
-    P2=$!
+    read_2_upload_response=\$(icav2 projectdata upload ${read_2_file} --project-id ${projectId})
     echo "\${read_2_upload_response}" > \${read_2_file_response}
-
-    wait \${P1} \${P2}
 
     # id of file starts with 'fil.'
     read_1_file_id=\$(cat \${read_1_file_response} | grep -i '\"id\": \"fil' | grep -o 'fil.[^\"]*')
