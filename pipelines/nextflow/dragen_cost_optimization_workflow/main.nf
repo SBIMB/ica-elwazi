@@ -1,26 +1,5 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
-projectId = params.projectId
-read1AnalysisDataCode = params.read1AnalysisDataCode
-read2AnalysisDataCode = params.read2AnalysisDataCode
-fastqsAnalysisDataCode = params.fastqsAnalysisDataCode
-fastqListDataCode = params.fastqListDataCode
-referenceAnalysisDataCode = params.referenceAnalysisDataCode
-pipelineId = params.pipelineId
-pipelineCode = params.pipelineCode
-userReference = params.userReference
-storageSize = params.storageSize
-hashTableConfigFile = params.hashTableConfigFile
-referenceDirectory = params.referenceDirectory
-intermediateResultsDirectory = params.intermediateResultsDirectory
-fileStatusCheckInterval = params.fileStatusCheckInterval
-fileStatusCheckLimit = params.fileStatusCheckLimit
-analysisStatusCheckInterval = params.analysisStatusCheckInterval
-analysisStatusCheckLimit = params.analysisStatusCheckLimit
-readsFileUploadPath = params.readsFileUploadPath
-referenceFileId = params.referenceFileId
-readsPairFilesUploadPath = params.readsPairFilesUploadPath
-localDownloadPath = params.localDownloadPath
 
 process uploadFastqFilePairs {
     debug true
@@ -32,6 +11,9 @@ process uploadFastqFilePairs {
     path "data.txt", emit: dataFile
 
     script:
+    def projectId = params.projectId
+    def read1AnalysisDataCode = params.read1AnalysisDataCode
+    def read2AnalysisDataCode = params.read2AnalysisDataCode
     def (read_1_file, read_2_file) = reads
     """
     #!/bin/bash
@@ -112,6 +94,8 @@ process uploadFastqFileList {
     path "data.txt", emit: dataFile
 
     script:
+    def projectId = params.projectId
+    def fastqListDataCode = params.fastqListDataCode
     """
     #!/bin/bash
     time_stamp=\$(date +"%Y-%m-%d %H:%M:%S")
@@ -165,10 +149,13 @@ process getReferenceFile {
   path "data.txt", emit: dataFile
 
   script:
-  def reference_file_name = ""
+  def projectId = params.projectId
+  def referenceFileId = params.referenceFileId
+  def referenceAnalysisDataCode = params.referenceAnalysisDataCode
   """
   #!/bin/bash
   time_stamp=\$(date +"%Y-%m-%d %H:%M:%S")
+  reference_file_name=""
 
   get_reference_file_response_file="get_reference_file_response.txt"
   touch \${get_reference_file_response_file}
@@ -196,6 +183,8 @@ process checkFileStatus {
     path "data.txt", emit: dataFile
 
     script:
+    def fileStatusCheckLimit = params.fileStatusCheckLimit
+    def fileStatusCheckInterval = params.fileStatusCheckInterval
     """
     #!/bin/bash
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
@@ -275,6 +264,12 @@ process startAnalysis {
     path "data.txt", emit: dataFile
 
     script:
+    def projectId = params.projectId
+    def pipelineId = params.pipelineId
+    def userReference = params.userReference
+    def storageSize = params.storageSize
+    def fastqsAnalysisDataCode = params.fastqsAnalysisDataCode
+    def fastqListDataCode = params.fastqListDataCode
     """
     #!/bin/bash
 
@@ -339,6 +334,8 @@ process checkAnalysisStatus {
     path "data.txt", emit: dataFile
 
     script:
+    def analysisStatusCheckInterval = params.analysisStatusCheckInterval
+    def analysisStatusCheckLimit = params.analysisStatusCheckLimit
     """
     #!/bin/bash
 
@@ -405,6 +402,7 @@ process downloadAnalysisOutput {
     path "data.txt", emit: dataFile
 
     script:
+    def localDownloadPath = params.localDownloadPath
     """
     #!/bin/bash
     analysis_id=\$(cat ${dataFile} | grep -o 'analysisId:.*' | cut -f2- -d:)
@@ -462,6 +460,7 @@ process deleteData {
 }
 
 workflow {
+    readsPairFilesUploadPath = params.readsPairFilesUploadPath
     fastqFilePairs = Channel.fromFilePairs(readsPairFilesUploadPath, checkIfExists:true)
 
     uploadFastqFilePairs(fastqFilePairs)
