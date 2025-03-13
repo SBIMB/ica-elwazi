@@ -1,0 +1,5 @@
+{
+    "readsFileUploadPath": "/home/regan/ica_data_uploads/1000G/SRR1291036/*",
+    "readsPairFilesUploadPath": "/home/regan/ica_data_uploads/1000G/**/*_{1,2}.fastq.gz"
+}
+
