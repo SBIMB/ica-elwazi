@@ -29,13 +29,17 @@ process uploadFastqFilePairs {
 
     printf "[\${time_stamp}]: "
     printf "Uploading read 1 file '${read_1_file}'... \n"
-    read_1_upload_response=\$(icav2 projectdata upload ${read_1_file} --project-id ${projectId})
+    read_1_upload_response=\$(icav2 projectdata upload ${read_1_file} --project-id ${projectId} &)
+    P1=$!
     echo "\${read_1_upload_response}" > \${read_1_file_response}
 
     printf "[\${time_stamp}]: "
     printf "Uploading read 2 file '${read_2_file}'... \n"
-    read_2_upload_response=\$(icav2 projectdata upload ${read_2_file} --project-id ${projectId})
+    read_2_upload_response=\$(icav2 projectdata upload ${read_2_file} --project-id ${projectId} &)
+    P2=$!
     echo "\${read_2_upload_response}" > \${read_2_file_response}
+
+    wait \${P1} \${P2}
 
     # id of file starts with 'fil.'
     read_1_file_id=\$(cat \${read_1_file_response} | grep -i '\"id\": \"fil' | grep -o 'fil.[^\"]*')
@@ -146,12 +150,12 @@ process getReferenceFile {
 
   script:
   def projectId = params.projectId
-  def referenceAnalysisDataCode = params.referenceAnalysisDataCode
   def referenceFileId = params.referenceFileId
-  def reference_file_name = ""
+  def referenceAnalysisDataCode = params.referenceAnalysisDataCode
   """
   #!/bin/bash
   time_stamp=\$(date +"%Y-%m-%d %H:%M:%S")
+  reference_file_name=""
 
   get_reference_file_response_file="get_reference_file_response.txt"
   touch \${get_reference_file_response_file}
@@ -179,8 +183,8 @@ process checkFileStatus {
     path "data.txt", emit: dataFile
 
     script:
-    def fileStatusCheckInterval = params.fileStatusCheckInterval
     def fileStatusCheckLimit = params.fileStatusCheckLimit
+    def fileStatusCheckInterval = params.fileStatusCheckInterval
     """
     #!/bin/bash
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
@@ -261,11 +265,11 @@ process startAnalysis {
 
     script:
     def projectId = params.projectId
-    def fastqsAnalysisDataCode = params.fastqsAnalysisDataCode
-    def fastqListDataCode = params.fastqListDataCode
     def pipelineId = params.pipelineId
     def userReference = params.userReference
     def storageSize = params.storageSize
+    def fastqsAnalysisDataCode = params.fastqsAnalysisDataCode
+    def fastqListDataCode = params.fastqListDataCode
     """
     #!/bin/bash
 
@@ -401,28 +405,20 @@ process downloadAnalysisOutput {
     def localDownloadPath = params.localDownloadPath
     """
     #!/bin/bash
-    analysis_status=\$(cat ${dataFile} | grep -o 'analysisStatus:.*' | cut -f2- -d:)
     analysis_id=\$(cat ${dataFile} | grep -o 'analysisId:.*' | cut -f2- -d:)
 
-    if [ "\$analysis_status" != "SUCCEEDED" ]; then
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Analysis did not succeed in previous process. Data will not be downloaded nor deleted...\n"
-        printf "deleteData:false\n" >> ${dataFile}
-    else
-        printf "[\${time_stamp}]: "
-        printf "Fetching analysis output response...\n"
-        analysis_output_response=\$(icav2 projectanalyses output \${analysis_id})
-        analysis_output_folder_id=\$(echo \${analysis_output_response} | jq -r ".items[].data[].dataId")
-        printf "Analysis output folder ID is '\${analysis_output_folder_id}'\n"
-        printf "Writing id of analysis output folder to existing data file...\n"
-        printf "outputFolderId:\${analysis_output_folder_id}\n" >> ${dataFile}
-        printf "deleteData:true\n" >> ${dataFile}
+    printf "[\${time_stamp}]: "
+    printf "Fetching analysis output response...\n"
+    analysis_output_response=\$(icav2 projectanalyses output \${analysis_id})
+    analysis_output_folder_id=\$(echo \${analysis_output_response} | jq -r ".items[].data[].dataId")
+    printf "Analysis output folder ID is '\${analysis_output_folder_id}'\n"
+    printf "Writing id of analysis output folder to existing data file...\n"
+    printf "outputFolderId:\${analysis_output_folder_id}\n" >> ${dataFile}
 
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Downloading analysis output folder with ID '\${analysis_output_folder_id}' to '${localDownloadPath}'...\n"
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Downloading analysis output folder with ID '\${analysis_output_folder_id}' to '${localDownloadPath}'...\n"
 
-        icav2 projectdata download \${analysis_output_folder_id} ${localDownloadPath}
-    fi
+    icav2 projectdata download \${analysis_output_folder_id} ${localDownloadPath}
     """
 }
 
@@ -437,41 +433,34 @@ process deleteData {
 
     script:
     """
-    delete_data=\$(cat ${dataFile} | grep -o 'deleteData:.*' | cut -f2- -d:)
+    sample_id=\$(cat ${dataFile} | grep -o 'sampleId:.*' | cut -f2- -d:)
+    read_1_file_id=\$(cat ${dataFile} | grep -o 'read1:.*' | cut -f2- -d:)
+    read_2_file_id=\$(cat ${dataFile} | grep -o 'read2:.*' | cut -f2- -d:)
+    fastq_list_file_id=\$(cat ${dataFile} | grep -o 'fastq_list:.*' | cut -f2- -d:)
+    analysis_output_folder_id=\$(cat ${dataFile} | grep -o 'outputFolderId:.*' | cut -f2- -d:)
 
-    if [ "\$delete_data" = "false" ]; then
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Data will NOT be deleted due to failed analysis...\n"
-    else
-        sample_id=\$(cat ${dataFile} | grep -o 'sampleId:.*' | cut -f2- -d:)
-        read_1_file_id=\$(cat ${dataFile} | grep -o 'read1:.*' | cut -f2- -d:)
-        read_2_file_id=\$(cat ${dataFile} | grep -o 'read2:.*' | cut -f2- -d:)
-        fastq_list_file_id=\$(cat ${dataFile} | grep -o 'fastq_list:.*' | cut -f2- -d:)
-        analysis_output_folder_id=\$(cat ${dataFile} | grep -o 'outputFolderId:.*' | cut -f2- -d:)
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Deleting uploaded read 1 file with ID '\${read_1_file_id}'...\n"
+    icav2 projectdata delete \${read_1_file_id}
 
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Deleting uploaded read 1 file with ID '\${read_1_file_id}'...\n"
-        icav2 projectdata delete \${read_1_file_id}
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Deleting uploaded read 2 file with ID '\${read_2_file_id}'...\n"
+    icav2 projectdata delete \${read_2_file_id}
 
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Deleting uploaded read 2 file with ID '\${read_2_file_id}'...\n"
-        icav2 projectdata delete \${read_2_file_id}
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Deleting uploaded CSV file with ID '\${fastq_list_file_id}'...\n"
+    icav2 projectdata delete \${fastq_list_file_id}
 
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Deleting uploaded CSV file with ID '\${fastq_list_file_id}'...\n"
-        icav2 projectdata delete \${fastq_list_file_id}
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Deleting analysis output folder with ID '\${analysis_output_folder_id}'...\n"
+    icav2 projectdata delete \${analysis_output_folder_id}
 
-        timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
-        printf "[\${timeStamp}]: Deleting analysis output folder with ID '\${analysis_output_folder_id}'...\n"
-        icav2 projectdata delete \${analysis_output_folder_id}
-
-        printf "Uploaded files and analysis output folder successfully deleted.\n"
-    fi
+    printf "Uploaded files and analysis output folder successfully deleted.\n"
     """
 }
 
 workflow {
-    def readsPairFilesUploadPath = params.readsPairFilesUploadPath
+    readsPairFilesUploadPath = params.readsPairFilesUploadPath
     fastqFilePairs = Channel.fromFilePairs(readsPairFilesUploadPath, checkIfExists:true)
 
     uploadFastqFilePairs(fastqFilePairs)
