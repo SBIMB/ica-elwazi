@@ -4,6 +4,7 @@ projectId = params.projectId
 read1AnalysisDataCode = params.read1AnalysisDataCode
 read2AnalysisDataCode = params.read2AnalysisDataCode
 fastqsAnalysisDataCode = params.fastqsAnalysisDataCode
+fastqListDataCode = params.fastqListDataCode
 referenceAnalysisDataCode = params.referenceAnalysisDataCode
 pipelineId = params.pipelineId
 pipelineCode = params.pipelineCode
@@ -22,7 +23,7 @@ localDownloadPath = params.localDownloadPath
 
 process uploadFastqFilePairs {
     debug true
-    maxForks 2
+    maxForks 4
     input:
     tuple val(sampleId), file(reads)
     val(projectId)
@@ -38,11 +39,6 @@ process uploadFastqFilePairs {
     read_1_file_id=""
     read_2_file_id=""
     ica_upload_path="/fastq/$sampleId/"
-
-    printf "sampleId: $sampleId \n"
-    printf "reads: $reads \n"
-    printf "read_1_file: $read_1_file \n"
-    printf "read_2_file: $read_2_file \n"
 
     read_1_file_response="read_1_file_response.txt"
     read_2_file_response="read_2_file_response.txt"
@@ -69,6 +65,8 @@ process uploadFastqFilePairs {
         printf "Failed to fetch data about file with id '\${read_1_file_id}'. \n"
         exit 1
     else
+        read_1_uploaded_file_name=\$(echo \${read_1_uploaded_file_data_response} | jq -r ".details.name")
+        printf "Name of uploaded file is '\${read_1_uploaded_file_name}'. \n"
         read_1_uploaded_file_path=\$(echo \${read_1_uploaded_file_data_response} | jq -r ".details.path")
         printf "Path of uploaded file is '\${read_1_uploaded_file_path}'. \n"
     fi
@@ -78,6 +76,8 @@ process uploadFastqFilePairs {
         printf "Failed to fetch data about file with id '\${read_2_file_id}'. \n"
         exit 1
     else
+        read_2_uploaded_file_name=\$(echo \${read_2_uploaded_file_data_response} | jq -r ".details.name")
+        printf "Name of uploaded file is '\${read_2_uploaded_file_name}'. \n"
         read_2_uploaded_file_path=\$(echo \${read_2_uploaded_file_data_response} | jq -r ".details.path")
         printf "Path of uploaded file is '\${read_2_uploaded_file_path}'. \n"
     fi
@@ -102,7 +102,6 @@ process uploadFastqFilePairs {
 
 process uploadFastqFileList {
     debug true
-    maxForks 2
     input:
     path(dataFile)
 
@@ -149,7 +148,7 @@ process uploadFastqFileList {
     printf "[\${time_stamp}]: "
     printf "Writing FASTQ list file id to existing data file...\n"
 
-    printf "fastq_list:\${fastq_list_file_id}\n" >> ${dataFile}
+    printf "${fastqListDataCode}:\${fastq_list_file_id}\n" >> ${dataFile}
     """
 }
 
@@ -184,6 +183,70 @@ process getReferenceFile {
   """
 }
 
+process checkFileStatus {
+    debug true
+    
+    input:
+    path(dataFile)
+
+    output:
+    path "data.txt", emit: dataFile
+
+    script:
+    """
+    #!/bin/bash
+    timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
+    printf "[\${timeStamp}]: Getting status of uploaded files...\n"
+
+    read_1_file_id=\$(cat ${dataFile} | grep -o 'read1:.*' | cut -f2- -d:)
+    read_2_file_id=\$(cat ${dataFile} | grep -o 'read2:.*' | cut -f2- -d:)
+    fastq_list_file_id=\$(cat ${dataFile} | grep -o 'fastq_list:.*' | cut -f2- -d:)
+    reference_file_id=\$(cat ${dataFile} | grep -o 'ref_tar:.*' | cut -f2- -d:)
+
+    read_1_file_data_response=\$(icav2 projectdata get \${read_1_file_id})
+    read_1_file_status=\$(echo \${read_1_file_data_response} | jq -r ".details.status")
+
+    read_2_file_data_response=\$(icav2 projectdata get \${read_2_file_id})
+    read_2_file_status=\$(echo \${read_2_file_data_response} | jq -r ".details.status")
+
+    fastq_list_file_data_response=\$(icav2 projectdata get \${fastq_list_file_id})
+    fastq_list_file_status=\$(echo \${fastq_list_file_data_response} | jq -r ".details.status")
+
+    reference_file_data_response=\$(icav2 projectdata get \${reference_file_id})
+    reference_file_status=\$(echo \${reference_file_data_response} | jq -r ".details.status")
+
+    if [[ \${read_1_file_status} == "AVAILABLE" ]]; then
+        printf "Read 1 file is AVAILABLE\n"
+    else
+        printf "Read 1 file is not AVAILABLE\n"
+        exit 1
+    fi
+
+    if [[ \${read_2_file_status} == "AVAILABLE" ]]; then
+        printf "Read 2 file is AVAILABLE\n"
+    else
+        printf "Read 2 file is not AVAILABLE\n"
+        exit 1
+    fi
+
+    if [[ \${fastq_list_file_status} == "AVAILABLE" ]]; then
+        printf "FASTQ list file is AVAILABLE\n"
+    else
+        printf "FASTQ list file is not AVAILABLE\n"
+        exit 1
+    fi
+
+    if [[ \${reference_file_status} == "AVAILABLE" ]]; then
+        printf "Reference file is AVAILABLE\n"
+    else
+        printf "Reference file is not AVAILABLE\n"
+        exit 1
+    fi
+
+    printf "readyForAnalysis:true\n" >> ${dataFile}
+    """
+}
+
 process startAnalysis {
     debug true
     
@@ -200,25 +263,28 @@ process startAnalysis {
     sample_id=\$(cat ${dataFile} | grep -o 'sampleId:.*' | cut -f2- -d:)
     read_1_file_id=\$(cat ${dataFile} | grep -o 'read1:.*' | cut -f2- -d:)
     read_2_file_id=\$(cat ${dataFile} | grep -o 'read2:.*' | cut -f2- -d:)
+    fastq_list_file_id=\$(cat ${dataFile} | grep -o 'fastq_list:.*' | cut -f2- -d:)
 
     read_1_analysis_code=\$(cat ${dataFile} | grep -E "read1")
     read_2_analysis_code=\$(cat ${dataFile} | grep -E "read2")
     reference_analysis_code=\$(cat ${dataFile} | grep -E "ref_tar")
 
-    output_directory="/output/\${sample_id}/"
+    user_reference=${userReference}-\${sample_id}
 
     timeStamp=\$(date +"%Y-%m-%d %H:%M:%S")
     printf "[\${timeStamp}]: Starting Nextflow analysis...\n"
 
     analysis_response=\$(icav2 projectpipelines start nextflow ${pipelineId} \
-        --user-reference ${userReference} \
+        --user-reference \${user_reference} \
         --project-id ${projectId} \
         --storage-size ${storageSize} \
         --input \${reference_analysis_code} \
         --input ${fastqsAnalysisDataCode}:"\${read_1_file_id},\${read_2_file_id}" \
+        --input ${fastqListDataCode}:\${fastq_list_file_id} \
         --parameters enable_map_align:true \
         --parameters enable_map_align_output:true \
         --parameters output_format:CRAM \
+        --parameters enable_duplicate_marking:true \
         --parameters enable_variant_caller:true \
         --parameters vc_emit_ref_confidence:BP_RESOLUTION \
         --parameters vc_enable_vcf_output:true \
@@ -375,7 +441,7 @@ process deleteData {
     printf "[\${timeStamp}]: Deleting folder containing pair of FASTQ files with path '\${ica_upload_path}'...\n"
     icav2 projectdata delete \${ica_upload_path} --project-id ${projectId}
 
-    printf "Uploaded file and analysis output folder successfully deleted.\n"
+    printf "Uploaded files and analysis output folder successfully deleted.\n"
     """
 }
 
@@ -385,7 +451,8 @@ workflow {
     uploadFastqFilePairs(fastqFilePairs, params.projectId)
     uploadFastqFileList(uploadFastqFilePairs.out.dataFile)
     getReferenceFile(uploadFastqFileList.out.dataFile)
-    startAnalysis(getReferenceFile.out.dataFile)
+    checkFileStatus(getReferenceFile.out.dataFile)
+    startAnalysis(checkFileStatus.out.dataFile)
     checkAnalysisStatus(startAnalysis.out.dataFile, params.analysisStatusCheckInterval)
     downloadAnalysisOutput(checkAnalysisStatus.out.dataFile, params.localDownloadPath)
     deleteData(downloadAnalysisOutput.out.dataFile)
