@@ -97,3 +97,6 @@ analysisId:9aa57a35-7e66-4d4e-9c05-729767ff0290
 analysisRef:regan_dragen_germline_whole_genome_test_05-DRAGEN Germline Whole Genome 4-3-6-a7f59145-3f93-4579-9129-c2b726dc4414
 outputFolderId:fol.7cdafdb7363062eef75b08edbbcdd56a
 ```   
+
+## Acknowledgements
+The eLwazi Open Data Science Platform is supported by the Office Of The Director, National Institutes Of Health (OD), National Institution of Biomedical Imaging and Bioengineering, and NIH award number 1 U2C EB 032224. This workflow is also partially supported by a grant from the South African Medical Research Council through a Strategic Health Initiative Partnership.  This work is solely the responsibility of the authors and does not necessarily represent the official views of the funder.
