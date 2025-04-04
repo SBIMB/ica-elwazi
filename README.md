@@ -99,4 +99,6 @@ outputFolderId:fol.7cdafdb7363062eef75b08edbbcdd56a
 ```   
 
 ## Acknowledgements
+![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   
+
 The eLwazi Open Data Science Platform is supported by the Office Of The Director, National Institutes Of Health (OD), National Institution of Biomedical Imaging and Bioengineering, and NIH award number 1 U2C EB 032224. This workflow is also partially supported by a grant from the South African Medical Research Council through a Strategic Health Initiative Partnership.  This work is solely the responsibility of the authors and does not necessarily represent the official views of the funder.
