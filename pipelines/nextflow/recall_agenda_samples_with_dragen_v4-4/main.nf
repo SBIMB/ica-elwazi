@@ -419,7 +419,7 @@ workflow {
       file -> file.name.replaceAll(/.cram|.crai$/,'') 
     }
     uploadCramFiles(cramFilePairsChannel)
-    getReferenceFile(cramFilePairsChannel.out.dataFile)
+    getReferenceFile(uploadCramFiles.out.dataFile)
     checkFileStatus(getReferenceFile.out.dataFile)
     // startAnalysis(checkFileStatus.out.dataFile)
     // checkAnalysisStatus(startAnalysis.out.dataFile)
