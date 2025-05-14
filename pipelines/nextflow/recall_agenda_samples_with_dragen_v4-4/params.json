@@ -1,0 +1,18 @@
+{
+    "projectId": "d8c5084a-87fc-429b-b0b6-04bdf1ef1739",
+    "pipelineId": "993fa5a5-1e3d-43cd-a26b-1ffa053e3c1e",
+    "userReference": "dragen_germline_whole_genome_4-4-4",
+    "storageSize": "Medium",
+    "referenceAnalysisDataCode": "ref_tar",
+    "cramAnalysisDataCode": "crams",
+    "cramIndexAnalysisDataCode": "crais",
+    "fileStatusCheckInterval": 120,
+    "fileStatusCheckLimit": 10,
+    "analysisStatusCheckInterval": 300,
+    "analysisStatusCheckLimit": 100,
+    "cramFilesUploadPath": "/home/regan/ica_data_uploads/AGenDA/LP2100148-DNA_A01/*",
+    "cramFilePairsUploadPath": "/home/regan/ica_data_uploads/AGenDA/**/*.{cram, cram.crai}",
+    "referenceFileId": "fil.62d43552f5fb41e0a50408dd7845ec0e",
+    "localDownloadPath": "/home/regan/ica_data_downloads"
+}
+
