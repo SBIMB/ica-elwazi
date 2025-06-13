@@ -89,7 +89,14 @@ ln -s /dataA/1000G/SRR1293295_2.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1
 ```
 The above commands ensure that when accessing the directory, `/home/regan/ica_data_uploads/1000G/SRR1291036`, the two individual FASTQ read pairs `SRR1291036_1.fastq.gz` and `SRR1291036_2.fastq.gz` will both be available. Inside the [params.json](nextflow_workflows/fastq_input_dragen_ica_workflow/params.json), the key _"readsPairFilesUploadPath"_ can be assigned the value: "/home/regan/ica_data_uploads/1000G/**/*_{1,2}.fastq.gz". The double star (or asterisk) in the path means that Nextflow will look for the FASTQ read pairs in all folders and subfolders in the `/home/regan/ica_data_uploads/1000G` directory.    
 
-To run any of these workflows, simply enter the directory where the `main.nf` and `params.json` files are in, and then run:
+To save time and to avoid potentially wasting money (credits), it is often a good idea to verify that none of the FASTQ files are corrupted. This can be done using the `sequence` module inside the Wits HPC cluster, i.e.
+```bash
+module load sequence
+seqkit stats <file1> <file2>
+```
+The output of this command will provide some stats relating to the FASTQ reads. If the file is corrupted, an error will be thrown. A corrupted file should not be used, since the DRAGEN analysis would fail. However, even if a DRAGEN analysis fails halfway through the analysis, we will still be billed for compute.   
+
+Once all the files have been validated and the necessary symlinks have been created, we can run any of these workflows by simply entering the directory where the `main.nf` and `params.json` files are in, and then running:
 ```bash
 nextflow main.nf -params-file params.json
 ```   
