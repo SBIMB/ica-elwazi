@@ -12,7 +12,7 @@ We can use a combination of both the [API](https://ica.illumina.com/ica/api/swag
 Before we can begin, we need to have an existing project or create a new project. For the rest of this README, we'll be referring to the existing project, **SGDP**.   
 
 ## Authentication
-Authentication is required in order to use the API or the CLI. After logging in to the UI, an API key needs to be created. Instructions for generating an API key can be found over [here](https://help.ica.illumina.com/account-management/am-iam#api-keys).   
+Authentication is required in order to use the API or the CLI. After logging in to the UI, an API key needs to be created. Instructions for generating an API key can be found over [here](https://help.ica.illumina.com/get-started/gs-getstarted#api-keys).   
 
 There are two ways to authenticate in order to make use of the API:
 1. API key + JWT for the entire API, except for the POST `/tokens` endpoint.
@@ -44,74 +44,86 @@ Our goal is to create a process that achieves the following:
 A diagram illustrating a single file upload-analysis-download-delete process can be seen below:   
 ![Upload-Download ICA Bash Process](public/assets/images/ica_upload_download_bash_process.png "Upload-Download ICA Bash Process")   
 
-## DRAGEN Pipeline for Pair of FASTQ Files   
+## DRAGEN ICA Workflow for A Pair of FASTQ Files   
 When running the **DRAGEN Germline Whole Genome 4-3-6** pipeline using a pair of .fastq files, we need to also provide a .csv file containg some metadata about the .fastq file pair. As an illustration, suppose the names of the .fastq files for a given analysis are __mysample_R1_001.fastq__ and __mysample_R2_001.fastq__, then the .csv file will contain the following data:   
 ```csv
 RGID,RGSM,RGLB,Lane,Read1File,Read2File
 mysample,mysample,RGLB,1,mysample_R1_001.fastq,mysample_R2_001.fastq
 ```   
-The reference file to be used is the __chm13_v2-cnv.hla.methylation_combined.rna_v4.tar.gz__. Reference files for the DRAGEN pipelines always have a .tar extension.   
 
-The Nextflow pipeline (or workflow) responsible for the uploading, triggering of DRAGEN analysis, polling analysis status, downloading output, and then deleting the analysis output and uploaded files can be found over [here](pipelines/nextflow/fastq_single_pair_dragen_analysis_with_upload/main.nf).    
+Reference files for the DRAGEN pipelines always have a .tar extension. The reference file that we are interested in using is the __chm13_v2-cnv.hla.methylation_combined.rna_v4.tar.gz__, which is commonly referred to as T2T (or telomere-to-telomere). However, some of our analyses may require the use of the older reference, i.e. **_hg38-alt_masked.cnv.hla.methyl_cg.methylated_combined.rna-11-r5.0-2.tar.gz_**, which is commonly referred to as build38.     
 
-![FASTQ-Upload-Analyse-Download-Delete Workflow](public/assets/images/fastq_upload_analyse_download_delete.png "FASTQ-Upload-Analyse-Download-Delete Workflow")    
+The Nextflow pipeline (or workflow) responsible for the uploading, the triggering of a DRAGEN analysis, the polling of the analysis status, the downloading of the analysis results output, and then the deleting of the analysis output and the uploaded files can be found over [here](nextflow_workflows/fastq_input_dragen_ica_workflow/main.nf).    
 
-(The above diagram was generated using the [Mermaid Live Editor](https://mermaid.live/) with the following markup code:   
+![FASTQ Input for DRAGEN ICA Workflow](public/assets/images/fastq_input_dragen_ica_workflow.png "FASTQ Input for DRAGEN ICA Workflow")     
+
+### An Example of Using the Workflow on the Wits HPC Cluster
+Suppose there exists a directory somewhere on the Wits HPC Cluster, say at location `/dataA/1000G`, where several FASTQ read pairs are stored, i.e. 
+- `/dataA/1000G/SRR1291036_1.fastq.gz`
+- `/dataA/1000G/SRR1291036_2.fastq.gz`
+- `/dataA/1000G/SRR1291041_1.fastq.gz`
+- `/dataA/1000G/SRR1291041_2.fastq.gz`
+- `/dataA/1000G/SRR1293295_1.fastq.gz`
+- `/dataA/1000G/SRR1293295_2.fastq.gz`   
+
+It is convenient to create symlinks for these samples in our own home folder. For example, create a directory called `ica_data_uploads`. Inside this directory, create a new directory called `1000G` to specify the project to which these samples belong. Finally, create an individual directory for each read pair respectively, where the name of the directory corresponds to the sample ID, i.e. 
 ```bash
-flowchart LR
-    A[FASTQ reads] --> D(upload to ICA)
-    B[reference file] --> D(upload to ICA)
-    C[CSV file of FASTQ reads] --> D(upload to ICA)
-    D(upload to ICA) --> |write file ids to data.txt| E(start DRAGEN analysis)
-    E(start DRAGEN analysis) --> |write analysis_id to data.txt| F{check analysis status}
-    F{analysis status?} --> |SUCCEEDED| G(dowload analysis output)
-    F{analysis status?} --> |SUCCEEDED| G(dowload analysis output)
-    F{analysis status?} --> |FAILED| H(end workflow)
-    G(dowload analysis output) --> |write output_folder_id to data.txt| I(delete output folder & uploaded files)
+mkdir -p ica_data_uploads
+cd ica_data_uploads
+mkdir -p 1000G
+cd 1000G
+mkdir -p SRR1291036
+mkdir -p SRR1291041
+mkdir -p SRR1293295
 ```
-)   
+We'd then like to create a symlink for the read pairs and the corresponding folder or directory whose name is the sample ID of the read pair. This can be done by running the following commands:
+```bash
+ln -s /dataA/1000G/SRR1291036_1.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1291036
+ln -s /dataA/1000G/SRR1291036_2.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1291036
 
-The workflow passes data from process to process in the form of a .txt file called `data.txt`. All necessary data (like ids) gets written to the `.txt` file as the workflow implements the different processes. This is an example of what the `data.txt` file would look like:   
-```txt
-sampleId:ERR1019050
-read1:fil.85255ad2588d4e5fe75a08dcaabcc45f
-read2:fil.6bcfeca6252941dde75b08dcaabcc45f
-ref_tar:fil.2e3fd8d802ee4963da2208dc484ea8f0
-read1Name:ERR1019050_R1_001.fastq
-read2Name:ERR1019050_R2_001.fastq
-analysisId:9aa57a35-7e66-4d4e-9c05-729767ff0290
-analysisRef:regan_dragen_germline_whole_genome_test_05-DRAGEN Germline Whole Genome 4-3-6-a7f59145-3f93-4579-9129-c2b726dc4414
-outputFolderId:fol.7cdafdb7363062eef75b08edbbcdd56a
-```   
+ln -s /dataA/1000G/SRR1291041_1.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1291041
+ln -s /dataA/1000G/SRR1291041_2.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1291041
 
-If the files are already in ICA and don't need to be uploaded, then a shorter workflow can be used, i.e. the [fastq_single_pair_dragen_analysis_no_upload](pipelines/nextflow/fastq_single_pair_dragen_analysis_no_upload/) workflow. This workflow skips the upload process. Consequently, the file ids of the already uploaded files will need to be provided in the `params.json`.   
-
-![FASTQ-Analyse-Download-Delete Workflow](public/assets/images/fastq_analyse_download_delete.png "FASTQ-Analyse-Download-Delete Workflow")    
-
-Finally, an even shorter workflow exists, i.e. the [fastq_single_pair_dragen_analysis_download](pipelines/nextflow/fastq_single_pair_dragen_analysis_download/) workflow. This one is to be used when files have already been uploaded and the DRAGEN analysis has already run to completion. In that case, only the download and delete processes are required.   
-
-![FASTQ-Download-Delete Workflow](public/assets/images/fastq_download_delete.png "FASTQ-Download-Delete Workflow")    
+ln -s /dataA/1000G/SRR1293295_1.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1293295
+ln -s /dataA/1000G/SRR1293295_2.fastq.gz /home/regan/ica_data_uploads/1000G/SRR1293295
+```
+The above commands ensure that when accessing the directory, `/home/regan/ica_data_uploads/1000G/SRR1291036`, the two individual FASTQ read pairs `SRR1291036_1.fastq.gz` and `SRR1291036_2.fastq.gz` will both be available. Inside the [params.json](nextflow_workflows/fastq_input_dragen_ica_workflow/params.json), the key _"readsPairFilesUploadPath"_ can be assigned the value: "/home/regan/ica_data_uploads/1000G/**/*_{1,2}.fastq.gz". The double star (or asterisk) in the path means that Nextflow will look for the FASTQ read pairs in all folders and subfolders in the `/home/regan/ica_data_uploads/1000G` directory.    
 
 To run any of these workflows, simply enter the directory where the `main.nf` and `params.json` files are in, and then run:
-```
+```bash
 nextflow main.nf -params-file params.json
-```
-
-## DRAGEN Pipeline for BAM Files
-When running the **DRAGEN Germline Whole Genome 4-3-6** pipeline using a .bam file as input, the .bam indexes (.bai) are required when _realignment is disabled_. Since all the .bam files are stored in a single directory, the _sampleId_ needs to be provided in the `params.json` so that we know which file to upload and analyse. The corresponding index file (.bam.bai) will also be uploaded. The workflow for the uploading, triggering of DRAGEN analysis, polling analysis status, downloading analysis output, and deleting output and uploaded files can be found over [here](pipelines/nextflow/bam_single_dragen_analysis_with_upload/).   
-
-Similarly to the workflow logic for the .fastq files, data gets written to a .txt file called `data.txt`. This is an example of what the `data.txt` file would look like:   
-```txt
-sampleId:myBamFile
-bam:fil.85255ad2588d4e5fe75a08dcaabcc45f
-bai:fil.6bcfeca6252941dde75b08dcaabcc45f
-ref_tar:fil.2e3fd8d802ee4963da2208dc484ea8f0
-bamFileName:myBamFile.bam
-baiFileName:myBamFile.bam.bai
-analysisId:9aa57a35-7e66-4d4e-9c05-729767ff0290
-analysisRef:regan_dragen_germline_whole_genome_test_05-DRAGEN Germline Whole Genome 4-3-6-a7f59145-3f93-4579-9129-c2b726dc4414
-outputFolderId:fol.7cdafdb7363062eef75b08edbbcdd56a
 ```   
+
+Due to how long it can take to run the workflow on a batch of samples, it is more efficient to make use of Linux's [screen](https://www.geeksforgeeks.org/linux-unix/screen-command-in-linux-with-examples/) command. This allows us to detach from the terminal session but keeps the terminal session running in the background.   
+
+Suppose we are on worker node number 4, i.e. `n04`. By running the command,
+```bash
+screen
+```
+we'll be taken to a blank terminal session. While in this terminal session, we can navigate to the desired directory and run the workflow with `nextflow run main.nf -params-file params.json`. Once it has started running, we can detach from the screen session by pressing (on the keyboard) **ctrl+A** and then pressing **D** to detach. After detaching, the terminal will display a reference for the currently detached screen session. This reference may look something like this: 
+```bash
+4084463.pts-21.n04
+```
+It's important to make a note of this reference, since it will be required later when reattaching to this screen session. To reattach, we simply run:
+```bash
+screen -r 4084463.pts-21.n04
+```
+Once reattached, we can see the progress of our running workflow. If it has failed, we should investigate why and try to fix and resume the workflow.   
+
+## DRAGEN ICA Workflow for A BAM/CRAM and BAM/CRAM Index File Pair   
+There are many similarities when using the DRAGEN ICA workflow with CRAM or BAM inputs. CRAM and BAM files also come in pairs. However, instead of being oppositely aligned reads, they instead come along with an index file (`.bam.bai` and `.cram.crai`, respectively). This means that the upload process in the workflow stays mostly the same when dealing with either FASTQ pairs or BAM/CRAM and their index pairs.   
+
+The major difference comes with the pipeline parameters being specified in the **startAnalysis** process. For BAM/CRAM file input, the parameter "enable_map_align" needs to be false, since realignment is not required when using BAM/CRAM as input. Since this parameter is false, there are other parameters that necessarily become false as well.   
+
+The entire workflow for BAM input can be found over [here](nextflow_workflows/bam_input_dragen_ica_workflow/main.nf), and for CRAM input over [here](nextflow_workflows/cram_input_dragen_ica_workflow/main.nf).   
+
+## DRAGEN ICA Workflow for Joint Genotyping
+We need to investigate the best way to go about performing joint genotyping on a batch of samples. The ICA pipeline to use is the **DRAGEN_Joint_Pedigree_Calling_4-4-4**. As part of the pipeline parameters, we need to note the following:
+- For our purposes, we will not be using a pedigree file (this file describes the relationship among the different samples).
+- We need to provide a list or set of GVCFs for comparison. These GVCF files need to be uploaded to the ICA platform _before_ running the joint genotyping pipeline.
+- If performing joint genotyping on CNVs, then we will need to provide normalized TSV files generated from DRAGEN CNV calling. These TSV files would also need to be uploaded to the ICA platform before running the joint genotyping pipeline.   
+
+We note that in order to perform joint genotyping on a sample, we need access to the GVCFs of related samples that were generated from a DRAGEN analysis. For automation purposes, whenever a DRAGEN analysis completes successfully, we should copy the relevant GVCF files from the output folder to a location inside the ICA platform _before_ downloading and deleting the output folder. This is so that when the next sample gets analysed, it can have the most recent GVCF files included in the comparison. It also saves us from having to reupload the GVCFs.
 
 ## Acknowledgements
 ![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   
