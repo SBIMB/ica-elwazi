@@ -12,8 +12,7 @@ flowchart LR
     C[CSV file of FASTQ reads] --> D(upload to ICA)
     D(upload to ICA) --> |write file ids to data.txt| E(start DRAGEN analysis)
     E(start DRAGEN analysis) --> |write analysis_id to data.txt| F{check analysis status}
-    F{analysis status?} --> |SUCCEEDED| G(dowload analysis output)
-    F{analysis status?} --> |SUCCEEDED| G(dowload analysis output)
+    F{analysis status?} --> |SUCCEEDED| G(download analysis output)
     F{analysis status?} --> |FAILED| H(end workflow)
-    G(dowload analysis output) --> |write output_folder_id to data.txt| I(delete output folder & uploaded files)
+    G(download analysis output) --> |write output_folder_id to data.txt| I(delete output folder & uploaded files)
 ``` 
