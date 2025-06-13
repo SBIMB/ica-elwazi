@@ -1,4 +1,4 @@
-# ica-v2-poc   
+# ICA eLwazi  
 ## Introduction   
 This is a simple proof of concept (POC) for automating certain processes that use the _Illumina Connected Analytics (ICA)_ CLI. The main processes that we wish to automate are:   
 
