@@ -1,0 +1,5 @@
+/dataC/AGenDA/batch1/AGS0001/LP2100148-DNA_A01.repeats.vcf.gz
+/dataC/AGenDA/batch1/AGS0002/LP2100148-DNA_B01.repeats.vcf.gz
+/dataC/AGenDA/batch1/AGS0002/LP2100148-DNA_C01.repeats.vcf.gz
+/dataC/AGenDA/batch1/AGS0002/LP2100148-DNA_D01.repeats.vcf.gz
+/dataC/AGenDA/batch1/AGS0002/LP2100148-DNA_E01.repeats.vcf.gz

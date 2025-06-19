@@ -130,9 +130,17 @@ We need to investigate the best way to go about performing joint genotyping on a
 - We need to provide a list or set of GVCFs for comparison. These GVCF files need to be uploaded to the ICA platform _before_ running the joint genotyping pipeline.
 - If performing joint genotyping on CNVs, then we will need to provide normalized TSV files generated from DRAGEN CNV calling. These TSV files would also need to be uploaded to the ICA platform before running the joint genotyping pipeline.   
 
-We note that in order to perform joint genotyping on a sample, we need access to the GVCFs of related samples that were generated from a DRAGEN analysis. For automation purposes, whenever a DRAGEN analysis completes successfully, we should copy the relevant GVCF files from the output folder to a location inside the ICA platform _before_ downloading and deleting the output folder. This is so that when the next sample gets analysed, it can have the most recent GVCF files included in the comparison. It also saves us from having to reupload the GVCFs.   
+We note that in order to perform joint genotyping on a sample, we need access to the GVCFs of related samples that were generated from a DRAGEN analysis. For automation purposes, whenever a DRAGEN analysis completes successfully, we should copy the relevant GVCF files from the output folder to a location inside the ICA platform _before_ downloading and deleting the output folder. This is so that when the next sample gets analysed, it can have the most recent GVCF files included in the comparison. It also saves us from having to reupload the GVCFs.    
 
 ![Joint Genotyping with DRAGEN ICA Workflow](public/assets/images/joint_genotyping_flowchart_tb.png "Joint Genotyping with DRAGEN ICA Workflow")   
+
+In order to run a joint genotyping analysis, we need to specify a list of `.gvcf.gz` files in the ICA platform. We can get these `.gvcf.gz` files by performing analyses with the DRAGEN Germline Whole Genome 4-4-4 pipeline. We can then upload all the `.gvcf.gz` files to a specified folder in ICA, i.e. a folder named `/GVCFs`.   
+
+A helper Bash script has been created for the bulk uploading of these GVCFs. The script for this bulk uploading of GVCFs is [upload_multiple_GVCFs.sh](bash_scripts/upload_multiple_GVCFs.sh), and the `txt` file containing the paths of the files to be uploaded can be found in the script [GVCFs_to_be_uploaded.txt](bash_scripts/txt_files/GVCFs_to_be_uploaded.txt).   
+
+The `repeats.vcf.gz` files can also be provided as input. These should be uploaded to a separate folder in the ICA platform, i.e. `/Repeats`.   
+
+The `tn.tsv.gz` files can also be provided as input. These should be uploaded to a separate folder in the ICA platform, i.e. `/Normalized_TSV_Files`.
 
 ## Acknowledgements
 ![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   
