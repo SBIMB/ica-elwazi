@@ -96,4 +96,4 @@ icav2 projectpipelines start nextflow $pipeline_id \
 	--storage-size $storage_size \
 	--input $file_ref
 ```
-The `$file_ref` variable is constructed from the analysis code and the file id as `analysisCode:fileId`. The script for the more detailed process is [start_nextflow_pipeline_analysis.sh](bash/helper_scripts/start_nextflow_pipeline_analysis.sh).   
+The `$file_ref` variable is constructed from the analysis code and the file id as `analysisCode:fileId`. The script for the more detailed process is [start_nextflow_pipeline_analysis.sh](./../bash_scripts/start_nextflow_pipeline_analysis.sh).   

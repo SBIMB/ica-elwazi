@@ -92,7 +92,7 @@ Notice that the JSON response contains an `"id"` key that begins with _"fil"_. W
 ```bash
 icav2 projectdata get <file-id> --project-id <project-id>
 ```   
-We have a [script](bash/helper_scripts/get_uploaded_file_id.sh) in the `/bash` directory that extracts the `file_id` programmatically using certain `bash` commands.    
+We have a [script](./../bash_scripts/get_uploaded_file_id.sh) in the `/bash` directory that extracts the `file_id` programmatically using certain `bash` commands.    
 
 ### Uploading Multiple Files or A Folder
 To upload multiple files, we can use the following command:

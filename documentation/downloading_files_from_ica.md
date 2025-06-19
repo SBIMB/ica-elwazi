@@ -10,6 +10,6 @@ Files can be downloaded from the ICA storage using the CLI with the following CL
 icav2 projectdata list # take note of the sourcePath
 icav2 projectdata download <sourcePath or dataId> <targetPath>
 ```
-The script [download_file_by_path.sh](./../bash/helper_scripts/download_file_by_path.sh) can be tested with some test data. A successful implementation of this download script should look as follows:   
+The script [download_file_by_path.sh](./../bash_scripts/download_file_by_path.sh) can be tested with some test data. A successful implementation of this download script should look as follows:   
 
 ![Download File from ICA Storage](./../public/assets/images/successful_download_script.png "Download File from ICA Storage")  

@@ -7,4 +7,4 @@ icav2 projectsamples create $sample_name \
     --user-tag $sample_user_tag \
     --technical-tag $sample_technical_tag
 ```
-The script [create_project_sample.sh](./../bash/helper_scripts/create_project_sample.sh) contains the logic for creating a project sample. Once a sample is created, we can link it to an existing project (in addition to the project to which it already belongs). We can also upload files or folders to a sample.
+The script [create_project_sample.sh](./../bash_scripts/create_project_sample.sh) contains the logic for creating a project sample. Once a sample is created, we can link it to an existing project (in addition to the project to which it already belongs). We can also upload files or folders to a sample.
