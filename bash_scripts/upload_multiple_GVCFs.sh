@@ -2,9 +2,6 @@
 project_id="d8c5084a-87fc-429b-b0b6-04bdf1ef1739"
 time_stamp=$(date +"%Y-%m-%d %H:%M:%S")
 
-file_id=""
-uploaded_file_path=""
-
 # path of text file with list of GVCFs
 list_of_GVCFs="GVCFs_to_be_uploaded.txt"
 
