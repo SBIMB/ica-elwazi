@@ -3,7 +3,7 @@ project_id="d8c5084a-87fc-429b-b0b6-04bdf1ef1739"
 time_stamp=$(date +"%Y-%m-%d %H:%M:%S")
 
 # path of text file with list of GVCFs
-list_of_GVCFs="GVCFs_to_be_uploaded.txt"
+list_of_GVCFs="txt_files/GVCFs_to_be_uploaded.txt"
 
 # Check if the file exists
 if [[ ! -f "$list_of_GVCFs" ]]; then
