@@ -283,22 +283,22 @@ process checkAnalysisStatus {
         elif [[ \${analysis_status} == "FAILED" ]]; then
             printf "Analysis FAILED \n"
             printf "analysisStatus:FAILED\n" >> ${dataFile}
-            exit 1
+            break;
 
         elif [[ \${analysis_status} == "FAILED_FINAL" ]]; then
             printf "Analysis FAILED_FINAL\n"
             printf "analysisStatus:FAILED_FINAL\n" >> ${dataFile}
-            exit 1
+            break;
 
         elif [[ \${analysis_status} == "ABORTED" ]]; then
             printf "Analysis ABORTED\n"
             printf "analysisStatus:ABORTED\n" >> ${dataFile}
-            exit 1
+            break;
 
         elif [[ \${analysis_status_check_count} -gt ${analysisStatusCheckLimit} ]]; then
             printf "Analysis status has been checked more than ${analysisStatusCheckLimit} times. Stopping...\n"
             printf "analysisStatus:TIMEOUT\n" >> ${dataFile}
-            exit 1
+            break;
 
         else
             printf "Analysis still in progress...\n"
