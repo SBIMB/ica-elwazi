@@ -140,7 +140,23 @@ A helper Bash script has been created for the bulk uploading of these GVCFs. The
 
 The `repeats.vcf.gz` files can also be provided as input. These should be uploaded to a separate folder in the ICA platform, i.e. `/Repeats`.   
 
-The `tn.tsv.gz` files can also be provided as input. These should be uploaded to a separate folder in the ICA platform, i.e. `/Normalized_TSV_Files`.
+The `tn.tsv.gz` files can also be provided as input. These should be uploaded to a separate folder in the ICA platform, i.e. `/Normalized_TSV_Files`.   
+
+Using the `icav2` command line tool, we need to either specify each `gvcf.gz` variant with the flag `--variant`, or we can provide the flag `--variant-list` which provides the path of a text file containing the absolute paths of all variants to be used. If using the latter method, it is advisable to keep the order of the variants the same for all subsequent analyses. Here is an example of how the `icav2` command would look:
+```nextflow
+    analysis_response=\$(icav2 projectpipelines start nextflow ${pipelineId} \
+        --user-reference \${user_reference} \
+        --project-id ${projectId} \
+        --storage-size ${storageSize} \
+        --input \${reference_analysis_code} \
+        --input ${cramAnalysisDataCode}:\${cram_file_id} \
+        --input ${cramIndexAnalysisDataCode}:\${crai_file_id} \
+        --variant sample1.gvcf.gz \
+        --variant sample2.gvcf.gz \
+        --variant-list /path/to/file/containing/list/of/sample*.gvcf.gz/files \
+        --parameters enable_joint_genotyping:true \
+        --parameters output_file_prefix:"\${sample_id}-joint")
+```
 
 ## Acknowledgements
 ![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   

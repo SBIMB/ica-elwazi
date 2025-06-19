@@ -1,0 +1,18 @@
+{
+    "projectId": "d8c5084a-87fc-429b-b0b6-04bdf1ef1739",
+    "pipelineId": "05b7e493-89d4-445d-853b-83addad39cca",
+    "userReference": "dragen_joint_pedigree_calling_v4-4-4",
+    "storageSize": "Medium",
+    "referenceAnalysisDataCode": "ref_tar",
+    "cramAnalysisDataCode": "crams",
+    "cramIndexAnalysisDataCode": "crais",
+    "fileStatusCheckInterval": 180,
+    "fileStatusCheckLimit": 100,
+    "analysisStatusCheckInterval": 300,
+    "analysisStatusCheckLimit": 100,
+    "cramFilesUploadPath": "/home/regan/ica_data_uploads/AGenDA",
+    "cramFilePairsUploadPath": "/home/regan/ica_data_uploads/AGenDA/**/*.{cram,crai}",
+    "referenceFileId": "fil.62d43552f5fb41e0a50408dd7845ec0e",
+    "localDownloadPath": "/home/regan/ica_data_downloads"
+}
+
