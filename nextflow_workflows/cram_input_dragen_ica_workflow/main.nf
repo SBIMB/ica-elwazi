@@ -186,6 +186,10 @@ process startAnalysis {
     def projectId = params.projectId
     def cramAnalysisDataCode = params.cramAnalysisDataCode
     def cramIndexAnalysisDataCode = params.cramIndexAnalysisDataCode
+    def cramReferenceAnalysisDataCode = params.cramReferenceAnalysisDataCode
+    def referenceAnalysisDataCode = params.referenceAnalysisDataCode
+    def referenceFileId = params.referenceFileId
+    def cramReferenceFileId = params.cramReferenceFileId
     def pipelineId = params.pipelineId
     def userReference = params.userReference
     def storageSize = params.storageSize
@@ -209,9 +213,10 @@ process startAnalysis {
         --user-reference \${user_reference} \
         --project-id ${projectId} \
         --storage-size ${storageSize} \
-        --input \${reference_analysis_code} \
+        --input ${referenceAnalysisDataCode}:${referenceFileId} \
         --input ${cramAnalysisDataCode}:\${cram_file_id} \
         --input ${cramIndexAnalysisDataCode}:\${crai_file_id} \
+        --input ${cramReferenceAnalysisDataCode}:${cramReferenceFileId} \
         --parameters enable_map_align:false \
         --parameters enable_map_align_output:false \
         --parameters enable_duplicate_marking:false \

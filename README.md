@@ -122,6 +122,8 @@ There are many similarities when using the DRAGEN ICA workflow with CRAM or BAM 
 
 The major difference comes with the pipeline parameters being specified in the **startAnalysis** process. For BAM/CRAM file input, the parameter "enable_map_align" needs to be false, since realignment is not required when using BAM/CRAM as input. Since this parameter is false, there are other parameters that necessarily become false as well.   
 
+When using the T2T (or chm13) reference, it is important to set the parameter `repeat_genotype_enable` to _false_. Furthermore, the T2T (or chm13) reference cannot be used directly with the AGenDA data, since the CRAM files from this data was created from the hg38 reference. To get around this, we need to specify the CRAM reference and the T2T reference in command for running the germline whole genome sequence pipeline.   
+
 The entire workflow for BAM input can be found over [here](nextflow_workflows/bam_input_dragen_ica_workflow/main.nf), and for CRAM input over [here](nextflow_workflows/cram_input_dragen_ica_workflow/main.nf).   
 
 ## DRAGEN ICA Workflow for Joint Genotyping
@@ -145,18 +147,29 @@ The `tn.tsv.gz` files can also be provided as input. These should be uploaded to
 Using the `icav2` command line tool, we need to either specify each `gvcf.gz` variant with the flag `--variant`, or we can provide the flag `--variant-list` which provides the path of a text file containing the absolute paths of all variants to be used. If using the latter method, it is advisable to keep the order of the variants the same for all subsequent analyses. Here is an example of how the `icav2` command would look:
 ```nextflow
     analysis_response=\$(icav2 projectpipelines start nextflow ${pipelineId} \
-        --user-reference \${user_reference} \
         --project-id ${projectId} \
+        --user-reference ${userReference} \
         --storage-size ${storageSize} \
-        --input \${reference_analysis_code} \
+        --input ${referenceAnalysisDataCode}:${referenceFileId} \
         --input ${cramAnalysisDataCode}:\${cram_file_id} \
         --input ${cramIndexAnalysisDataCode}:\${crai_file_id} \
-        --variant sample1.gvcf.gz \
-        --variant sample2.gvcf.gz \
-        --variant-list /path/to/file/containing/list/of/sample*.gvcf.gz/files \
+        --input ${tsvFilesAnalysisCode}:"${tsvFileId01},${tsvFileId02},${tsvFileId03},${tsvFileId04}" \
+        --input ${gvcfFilesAnalysisCode}:"${gvcfFileId01},${gvcfFileId02},${gvcfFileId03},${gvcfFileId04}" \
         --parameters enable_joint_genotyping:true \
-        --parameters output_file_prefix:"\${sample_id}-joint")
+        --parameters enable_variant_caller:true \
+        --parameters vc_emit_ref_confidence:GVCF \
+        --parameters vc_enable_vcf_output:true \
+        --parameters enable_cnv:true \
+        --parameters enable_sv:true \
+        --parameters repeat_genotype_enable:false \
+        --parameters enable_map_align:false \
+        --parameters enable_map_align_output:false \
+        --parameters enable_duplicate_marking:false \
+        --parameters enable_hla:false \
+        --parameters enable_variant_annotation:false \
+        --parameters output_file_prefix:"\${sample_id}")
 ```
+The IDs for the desired TSV and GVCF files need to be specified in the `params.json` file.   
 
 ## Acknowledgements
 ![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   
