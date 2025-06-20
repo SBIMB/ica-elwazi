@@ -24,7 +24,7 @@ analysis_response=$(icav2 projectpipelines start nextflow $pipeline_id \
     --input $cram_reference_analysis_code:"$cram_reference_file_id" \
     --input $cram_index_analysis_code:"$cram_index_file_id" \
     --parameters enable_map_align:true \
-    --parameters enable_map_align_output:true \
+    --parameters enable_map_align_output:false \
     --parameters enable_duplicate_marking:true \
     --parameters enable_variant_caller:true \
     --parameters vc_emit_ref_confidence:GVCF \
