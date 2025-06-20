@@ -22,14 +22,14 @@ analysis_response=$(icav2 projectpipelines start nextflow $pipeline_id \
     --input $cram_index_analysis_code:"$cram_index_file_id" \
     --parameters enable_map_align:false \
     --parameters enable_map_align_output:false \
-    --parameters enable_duplicate_marking:true \
+    --parameters enable_duplicate_marking:false \
     --parameters enable_variant_caller:true \
     --parameters vc_emit_ref_confidence:GVCF \
     --parameters vc_enable_vcf_output:true \
     --parameters enable_cnv:true \
     --parameters enable_sv:true \
-    --parameters repeat_genotype_enable:true \
-    --parameters enable_hla:true \
+    --parameters repeat_genotype_enable:false \
+    --parameters enable_hla:false \
     --parameters enable_variant_annotation:false \
     --parameters output_file_prefix:"$sample_id")
 
