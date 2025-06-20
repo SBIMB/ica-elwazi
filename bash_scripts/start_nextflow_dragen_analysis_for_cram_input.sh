@@ -10,7 +10,7 @@ cram_reference_analysis_code="cram_reference"
 ref_file_analysis_code="ref_tar"
 
 sample_id="LP2100148-DNA_A01"
-ref_file_id="fil.62d43552f5fb41e0a50408dd7845ec0e"
+ref_file_id="fil.e48b656abe864469ea9208dd77718397"
 cram_reference_file_id="fil.62d43552f5fb41e0a50408dd7845ec0e"
 cram_file_id="fil.8b815f0b4b7547502ffe08dd931c5122"
 cram_index_file_id="fil.6dbef3856a32416d2fff08dd931c5122"
