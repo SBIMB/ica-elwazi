@@ -184,11 +184,23 @@ process startAnalysis {
 
     script:
     def projectId = params.projectId
+    def referenceFileId = params.referenceFileId
     def cramAnalysisDataCode = params.cramAnalysisDataCode
     def cramIndexAnalysisDataCode = params.cramIndexAnalysisDataCode
+    def referenceAnalysisDataCode = params.referenceAnalysisDataCode
+    def tsvFilesAnalysisCode = params.tsvFilesAnalysisCode
+    def gvcfFilesAnalysisCode = params.gvcfFilesAnalysisCode
     def pipelineId = params.pipelineId
     def userReference = params.userReference
     def storageSize = params.storageSize
+    def tsvFileId01 = params.tsvFileId01
+    def tsvFileId02 = params.tsvFileId02
+    def tsvFileId03 = params.tsvFileId03
+    def tsvFileId04 = params.tsvFileId04
+    def gvcfFileId01 = params.gvcfFileId01
+    def gvcfFileId02 = params.gvcfFileId02
+    def gvcfFileId03 = params.gvcfFileId03
+    def gvcfFileId04 = params.gvcfFileId04
     """
     #!/bin/bash
 
@@ -198,7 +210,7 @@ process startAnalysis {
 
     cram_analysis_code=\$(cat ${dataFile} | grep -E "${cramAnalysisDataCode}")
     crai_analysis_code=\$(cat ${dataFile} | grep -E "${cramIndexAnalysisDataCode}")
-    reference_analysis_code=\$(cat ${dataFile} | grep -E "ref_tar")
+    reference_analysis_code=\$(cat ${dataFile} | grep -E "${referenceAnalysisDataCode}")
 
     user_reference=${userReference}-\${sample_id}
 
@@ -206,28 +218,27 @@ process startAnalysis {
     printf "[\${timeStamp}]: Starting Nextflow analysis...\n"
 
     analysis_response=\$(icav2 projectpipelines start nextflow ${pipelineId} \
-        --user-reference \${user_reference} \
         --project-id ${projectId} \
+        --user-reference \${user_reference} \
         --storage-size ${storageSize} \
-        --input \${reference_analysis_code} \
+        --input ${referenceAnalysisDataCode}:${referenceFileId} \
         --input ${cramAnalysisDataCode}:\${cram_file_id} \
         --input ${cramIndexAnalysisDataCode}:\${crai_file_id} \
-        --variant sample1.gvcf.gz \
-        --variant sample2.gvcf.gz \
-        --variant-list /path/to/file/containing/list/of/gvcf.gz/files \
+        --input ${tsvFilesAnalysisCode}:"${tsvFileId01},${tsvFileId02},${tsvFileId03},${tsvFileId04}" \
+        --input ${gvcfFilesAnalysisCode}:"${gvcfFileId01},${gvcfFileId02},${gvcfFileId03},${gvcfFileId04}" \
         --parameters enable_joint_genotyping:true \
-        --parameters enable_map_align:false \
-        --parameters enable_map_align_output:false \
-        --parameters enable_duplicate_marking:false \
         --parameters enable_variant_caller:true \
         --parameters vc_emit_ref_confidence:GVCF \
         --parameters vc_enable_vcf_output:true \
         --parameters enable_cnv:true \
         --parameters enable_sv:true \
-        --parameters repeat_genotype_enable:true \
+        --parameters repeat_genotype_enable:false \
+        --parameters enable_map_align:false \
+        --parameters enable_map_align_output:false \
+        --parameters enable_duplicate_marking:false \
         --parameters enable_hla:false \
         --parameters enable_variant_annotation:false \
-        --parameters output_file_prefix:"\${sample_id}-joint")
+        --parameters output_file_prefix:"\${sample_id}")
 
     analysis_response_file="analysis_response.txt"
     touch \${analysis_response_file}
