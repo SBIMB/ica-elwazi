@@ -219,6 +219,7 @@ process startAnalysis {
         --input ${cramReferenceAnalysisDataCode}:${cramReferenceFileId} \
         --parameters enable_map_align:true \
         --parameters enable_map_align_output:false \
+        --parameters output_format:CRAM \
         --parameters enable_duplicate_marking:true \
         --parameters enable_variant_caller:true \
         --parameters vc_emit_ref_confidence:GVCF \
