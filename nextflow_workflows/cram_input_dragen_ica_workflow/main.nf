@@ -224,8 +224,8 @@ process startAnalysis {
         --parameters enable_variant_caller:true \
         --parameters vc_emit_ref_confidence:GVCF \
         --parameters vc_enable_vcf_output:true \
-        --parameters enable_cnv:true \
-        --parameters enable_sv:true \
+        --parameters enable_cnv:false \
+        --parameters enable_sv:false \
         --parameters repeat_genotype_enable:false \
         --parameters enable_hla:false \
         --parameters enable_variant_annotation:false \

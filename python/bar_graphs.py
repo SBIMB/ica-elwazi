@@ -10,10 +10,13 @@ batch_of_three_total_wall_clock_time = 299.25 # minutes
 batch_of_four_total_individual_runtimes = 708.58 # minutes
 batch_of_four_total_wall_clock_time = 391.33 # minutes
 
-batches = ("Batch of Two", "Batch of Three", "Batch of Four")
+batch_of_six_total_individual_runtimes = 994 # minutes
+batch_of_six_total_wall_clock_time = 372 # minutes
+
+batches = ("Batch of Two", "Batch of Three", "Batch of Four", "Batch of Six")
 batch_times = {
-    'Wall-Clock Time': (batch_of_two_total_wall_clock_time, batch_of_three_total_wall_clock_time, batch_of_four_total_wall_clock_time),
-    'Sum Total of Workflow Runtimes': (batch_of_two_total_individual_runtimes, batch_of_three_total_individual_runtimes, batch_of_four_total_individual_runtimes)
+    'Wall-Clock Time': (batch_of_two_total_wall_clock_time, batch_of_three_total_wall_clock_time, batch_of_four_total_wall_clock_time, batch_of_six_total_wall_clock_time),
+    'Sum Total of Workflow Runtimes': (batch_of_two_total_individual_runtimes, batch_of_three_total_individual_runtimes, batch_of_four_total_individual_runtimes, batch_of_six_total_individual_runtimes)
 }
 
 x = np.arange(len(batches))
