@@ -1,5 +1,9 @@
-/dataC/AGenDA/batch1/AGS0001/LP2100148-DNA_A01.tn.tsv.gz
-/dataC/AGenDA/batch1/AGS0002/LP2100148-DNA_B01.tn.tsv.gz
-/dataC/AGenDA/batch1/AGS0003/LP2100148-DNA_C01.tn.tsv.gz
-/dataC/AGenDA/batch1/AGS0004/LP2100148-DNA_D01.tn.tsv.gz
-/dataC/AGenDA/batch1/AGS0005/LP2100148-DNA_E01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_A01/LP2100148-DNA_A01/LP2100148-DNA_A01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_B01/LP2100148-DNA_B01/LP2100148-DNA_B01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_C01/LP2100148-DNA_C01/LP2100148-DNA_C01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_D01/LP2100148-DNA_D01/LP2100148-DNA_D01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_E01/LP2100148-DNA_E01/LP2100148-DNA_E01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_F01/LP2100148-DNA_F01/LP2100148-DNA_F01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_G01/LP2100148-DNA_G01/LP2100148-DNA_G01.tn.tsv.gz
+/spaces/ica/dragen_germline_whole_genome_analyses/AGenDA_T2T_chm13_reference/LP2100148-DNA_H01/LP2100148-DNA_H01/LP2100148-DNA_H01.tn.tsv.gz
+

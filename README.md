@@ -144,7 +144,7 @@ The `repeats.vcf.gz` files can also be provided as input. These should be upload
 
 The `tn.tsv.gz` files can also be provided as input. These should be uploaded to a separate folder in the ICA platform, i.e. `/Normalized_TSV_Files`.   
 
-Using the `icav2` command line tool, we need to either specify each `gvcf.gz` variant with the flag `--variant`, or we can provide the flag `--variant-list` which provides the path of a text file containing the absolute paths of all variants to be used. If using the latter method, it is advisable to keep the order of the variants the same for all subsequent analyses. Here is an example of how the `icav2` command would look:
+Using the `icav2` command line tool, we need to either specify each `gvcf.gz` variant with the flag `--variant`, or we can provide the flag `--variant-list` which provides the path of a text file containing the absolute paths of all variants to be used. If using the latter method, it is advisable to keep the order of the variants the same for all subsequent analyses. In keeping with our usual pattern of using the data IDs of the files/folders in ICA, we can simply use the `--input` flag with the appropriate analysis code for the respective files/folders. Here is an example of how the `icav2` command would look:
 ```nextflow
     analysis_response=\$(icav2 projectpipelines start nextflow ${pipelineId} \
         --project-id ${projectId} \
@@ -169,7 +169,7 @@ Using the `icav2` command line tool, we need to either specify each `gvcf.gz` va
         --parameters enable_variant_annotation:false \
         --parameters output_file_prefix:"\${sample_id}")
 ```
-The IDs for the desired TSV and GVCF files need to be specified in the `params.json` file.   
+The analysis codes for the different input types can be found in ICA itself (although the values are contained in the different `params.json` files inside this repo). The IDs for the desired TSV and GVCF files need to be specified in the `params.json` file.   
 
 ## Acknowledgements
 ![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   
