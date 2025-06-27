@@ -171,6 +171,12 @@ Using the `icav2` command line tool, we need to either specify each `gvcf.gz` va
 ```
 The analysis codes for the different input types can be found in ICA itself (although the values are contained in the different `params.json` files inside this repo). The IDs for the desired TSV and GVCF files need to be specified in the `params.json` file.   
 
+## Iterative gVCF Genotyper Analysis (IGG)
+An IGG folder is contained in the repo over [here](popgen-cli-release). It is a command line interface that uses Python under the hood. We will need to think and design a solution where we can incorporate it into our Nextflow workflows or build an entirely new workflow.   
+
+## Basic Data Analysis and Statistics with Python
+There exists a [python folder](python) in this repo which contains some code or scripts for doing basic data analysis and plotting graphs.   
+
 ## Acknowledgements
 ![eLwazi](public/assets/images/elwazi_logo.png "eLwazi")   
 
