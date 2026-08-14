@@ -45,5 +45,6 @@ work
 .module
 .conda
 project-analyses
+project-data
 results
 secret
