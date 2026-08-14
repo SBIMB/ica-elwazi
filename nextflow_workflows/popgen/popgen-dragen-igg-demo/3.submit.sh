@@ -45,7 +45,7 @@ function step1 () {
 }
 
 function step2 () {
-    # aggregate census files and run annotation
+    # aggregate census files
 
     version_id=$1
     shard_ids=$2
@@ -58,13 +58,12 @@ function step2 () {
         --step-name $step_name \
         --version-ids $version_id \
         --shard-ids $shard_ids \
-        --enable-annotation true \
         --analysis-instance-tier $analysis_instance_tier
 }
 
 function count_subshards () {
     # get number of subshards per shard and upload to ica job project
-    # note: 
+    # note:
     # - run this before step3 (so that the number of subshard per shard is updated)
     # - this part of demo will be simplified as PopGen CLI utils
 
@@ -79,17 +78,25 @@ function count_subshards () {
     mkdir -p tmp
     for i in $(parse_range $shard_ids); do
         icav2 projectdata download -k "$key" --project-id $pid /data/global-census/shard-$i/dragen.shard.num-subshards.csv tmp/shard-$i.dragen.shard.num-subshards.csv
+        icav2 projectdata download -k "$key" --project-id $pid /data/global-census/shard-$i/dragen.subshards.stats.tsv tmp/shard-$i.dragen.subshards.stats.tsv
     done
 
     mkdir -p project-data/version-subshard
-    cat tmp/*.dragen.shard.num-subshards.csv | sort -t, -gk1,1 > project-data/version-subshard/version-$version_id.subshards.csv
+    rm -rf project-data/version-subshard/version-$version_id.subshards.csv
+    rm -rf project-data/version-subshard/version-$version_id.subshards.stats.tsv
+    for i in $(parse_range $shard_ids); do
+        cat tmp/shard-$i.dragen.shard.num-subshards.csv >> project-data/version-subshard/version-$version_id.subshards.csv
+	    cat tmp/shard-$i.dragen.subshards.stats.tsv >> project-data/version-subshard/version-$version_id.subshards.stats.tsv
+    done
     rm -r tmp
 
     echo "shard #subshard list written to project-data/version-subshard/version-$version_id.subshards.csv"
+    echo "shard #subshard stats written to project-data/version-subshard/version-$version_id.subshards.stats.tsv"
 
     # upload to job project meta folder
     pid=$(icav2 projects list -k "$key" | grep $prefix-jobs | awk '{print $1}')
     icav2 projectdata upload -k "$key" --project-id $pid project-data/version-subshard/version-$version_id.subshards.csv /meta/version-subshard/version-$version_id.subshards.csv
+    icav2 projectdata upload -k "$key" --project-id $pid project-data/version-subshard/version-$version_id.subshards.stats.tsv /meta/version-subshard/version-$version_id.subshards.stats.tsv
 }
 
 function step3 () {
@@ -116,13 +123,13 @@ function step3 () {
 
 function step4 () {
     # concat per output file format
-    # for demo, 6 file formats are grouped into 2 jobs 
+    # for demo, 5 file formats are grouped into 1 job
 
     version_id=$1
     chrom_ids=$2
     step_name="concat-msvcf"
 
-    for concat_options in anno-json,reduced-site-vcf,reduced-vcf pgen,site-vcf,vcf; do
+    for concat_options in reduced-site-vcf,reduced-vcf,pgen,site-vcf,vcf; do
         popgen-cli dragen-igg submit \
             --input-project-data-folder-path $input_project_data_folder_path \
             --input-project-config-file-path $input_project_config_file_path \
@@ -133,6 +140,23 @@ function step4 () {
             --concat-options $concat_options \
             --analysis-instance-tier $analysis_instance_tier
     done
+}
+
+function step5 () {
+    # annotate variant
+
+    version_id=$1
+    chrom_ids=$2
+    step_name="annotate-variant"
+
+    popgen-cli dragen-igg submit \
+        --input-project-data-folder-path $input_project_data_folder_path \
+        --input-project-config-file-path $input_project_config_file_path \
+        --output-analysis-json-folder-path $output_analysis_json_folder_path \
+        --step-name $step_name \
+        --version-ids $version_id \
+        --chrom-ids $chrom_ids \
+        --analysis-instance-tier $analysis_instance_tier
 }
 
 $@
@@ -148,6 +172,7 @@ $@
 # count_subshards $version_id $shard_ids
 # step3 $version_id $shard_ids
 # step4 $version_id $chrom_ids
+# step5 $version_id $chrom_ids
 
 # ------- demo version2 (batch1 + batch2) -------
 
@@ -160,5 +185,4 @@ $@
 # count_subshards $version_id $shard_ids
 # step3 $version_id $shard_ids
 # step4 $version_id $chrom_ids
-
-
+# step5 $version_id $chrom_ids

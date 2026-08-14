@@ -39,3 +39,11 @@ pipelines/nextflow/bam_single_dragen_analysis_with_upload/.nextflow.*
 config/
 config.yaml
 .session.ica.yaml
+
+work
+.nextflow*
+.module
+.conda
+project-analyses
+results
+secret
