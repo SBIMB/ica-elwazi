@@ -8,7 +8,7 @@ This repo contains nextflow workflows for running the iterative genotyper. These
 
 These steps should be carried out in a directory on the cluster that is shared with the task runner.
 
-1. Clone the [ica-igg-pipeline](https://github.com/SBIMB/ica-igg-pipeline/) repository.
+1. Clone the [ica-elwazi](https://github.com/SBIMB/ica-elwazi/) repository and change directory to `nextflow_workflows/popgen`.
 2. Install the `popgen-cli` contained in the repository. Or get the latest from [ICA](https://help.dragen.illumina.com/dragen-v4.5/reference/release-notes-readme/dragen-crn-v4.5.4#iterative-gvcf-genotyper-igg).
 
 ```bash
