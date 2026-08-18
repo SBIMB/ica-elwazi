@@ -26,6 +26,11 @@ process wait_for_ica {
           exit 1
         fi
 
+        if [ \$request_errors -ge 10 ]; then
+          echo "Failing \${job_id} after 10 failed status requests."
+          exit 1
+        fi        
+
         # Assume a transient network error
         if ! icav2 projectanalyses get --output-format json --project-id \${project_id} \${job_id} 1> job.json ; then
             request_errors=\$(( request_errors + 1 ))

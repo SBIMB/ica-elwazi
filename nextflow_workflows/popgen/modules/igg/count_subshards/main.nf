@@ -2,6 +2,9 @@
 nextflow.enable.dsl = 2
 
 process make_subshards {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val semaphor
     path config_file

@@ -19,6 +19,9 @@ process project_settings {
 }
 
 process upload_sequence_files {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     path local_batches, name: "local-batch-gvcf/*"
     val key
@@ -50,6 +53,9 @@ process upload_sequence_files {
 }
 
 process upload_files {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val key
     val project_id
@@ -63,6 +69,9 @@ process upload_files {
 }
 
 process upload_directory {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val key
     val project_id

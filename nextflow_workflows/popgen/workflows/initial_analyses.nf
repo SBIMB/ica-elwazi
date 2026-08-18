@@ -115,34 +115,34 @@ workflow {
 
 output {
     config_file {
-        path 'project-data/secret/project-config.json'
+        path "version-${params.version_no}/project-data/secret/project-config.json"
         mode 'copy'
     }
     static_config {
-        path 'project-data/'
+        path "version-${params.version_no}/project-data/"
         mode 'copy'
     }
     batch_gvcfs {
-        path 'project-data/'
+        path "version-${params.version_no}/project-data/"
         mode 'copy'
     }
     version_batches {
-        path 'project-data/'
+        path "version-${params.versio_no}/project-data/"
         mode 'copy'
     }
     version_genders {
-        path 'project-data/'
+        path "version-${params.version_no}/project-data/"
         mode 'copy'
     }
     census_data {
         path { results ->
-            "cohort-census/batch-${results.batch_no}"
+            "version-${params.version_no}/cohort-census/batch-${results.batch_no}"
         }
         mode 'copy'
     }
     msvcf_data {
         path { results ->
-            "msvcf/version-${results.version_no}"
+            "version-${params.version_no}/msvcf/version-${results.version_no}"
         }
         mode 'copy'
     }

@@ -2,6 +2,8 @@
 nextflow.enable.dsl = 2
 
 process annotate_variant {
+    errorStrategy 'retry'
+    maxRetries 3
     conda './.conda/popgen'
 
     input:

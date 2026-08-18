@@ -2,6 +2,9 @@
 nextflow.enable.dsl = 2
 
 process results_projects {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val semaphor
     path config_file
@@ -15,16 +18,20 @@ process results_projects {
     """
     project_name=\$(cat ${config_file} | jq -r .ica_job_project.name)
     prefix=\${project_name%-jobs}
+    project_list=\$(icav2 projects list -o table)
 
     census_project="\${prefix}-cohort-census"
-    census_project_id=\$(icav2 projects list -o table | grep \${census_project} | cut -f1)
+    census_project_id=\$(echo \$d | grep \${census_project} | cut -f1)
 
     msvcf_project="\${prefix}-msvcf-version-${version_no}"
-    msvcf_project_id=\$(icav2 projects list -o table | grep \${msvcf_project} | cut -f1)
+    msvcf_project_id=\$(echo \$d | grep \${msvcf_project} | cut -f1)
     """
 }
 
 process cohort_census {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val project_id
     val batch_no
@@ -42,6 +49,9 @@ process cohort_census {
 }
 
 process multi_sample_vcf {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val project_id
     val version_no

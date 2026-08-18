@@ -2,6 +2,9 @@
 nextflow.enable.dsl = 2
 
 process delete_inputs {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val semaphor
     path config_file
@@ -16,6 +19,9 @@ process delete_inputs {
 }
 
 process delete_results {
+    errorStrategy 'retry'
+    maxRetries 3
+
     input:
     val project_id
     // We are deleting all the data from the project, but we take a second arg to ensure

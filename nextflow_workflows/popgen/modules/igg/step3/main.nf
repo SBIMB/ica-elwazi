@@ -2,6 +2,8 @@
 nextflow.enable.dsl = 2
 
 process generate_msvcf {
+    errorStrategy 'retry'
+    maxRetries 3
     conda './.conda/popgen'
 
     input:
