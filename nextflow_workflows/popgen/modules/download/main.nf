@@ -28,69 +28,22 @@ process results_projects {
     """
 }
 
-process cohort_census {
+process project_data {
     errorStrategy 'retry'
     maxRetries 3
 
     input:
     val project_id
-    val batch_no
+    val results_path
 
     output:
-    path "data/batch-${batch_no}/", emit: dest
-    env "dir", emit: src
+    path "*"
 
     script:
     """
-    dir="/data/batch-${batch_no}/"
-    
-    icav2 projectdata download --project-id ${project_id} \${dir}* .
+    icav2 projectdata download --project-id ${project_id} /data/* .
+
+    mv ${results_path}/* .
+    rm -rf data
     """
-}
-
-process multi_sample_vcf {
-    errorStrategy 'retry'
-    maxRetries 3
-
-    input:
-    val project_id
-    val version_no
-
-    output:
-    path "data/", emit: dest
-    env "dir", emit: src
-
-    script:
-    """
-    dir="/data/"
-    
-    icav2 projectdata download --project-id ${project_id} \${dir}* .
-    """
-}
-
-workflow {
-
-    main:
-    // For testing purposes
-    results_projects('ok', "/Users/baruch/code/ica-igg-pipeline/test_config.json", 1)
-
-    view(results_projects.out)
-
-    cohort_census(results_projects.out.census_project, 1)
-    multi_sample_vcf(results_projects.out.msvcf_project, 1)
-
-    publish:
-    consensus_data = cohort_census.out.dest
-    msvcf_data = multi_sample_vcf.out.dest
-}
-
-output {
-    consensus_data {
-        path 'cohort-census'
-        mode 'copy'
-    }
-    msvcf_data {
-        path 'msvcf'
-        mode 'copy'
-    }
 }

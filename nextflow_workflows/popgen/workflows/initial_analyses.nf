@@ -110,8 +110,12 @@ workflow {
     batch_gvcfs = batches
     version_batches = version_batches
     version_genders = version_genders
-    census_data = [batch_no: batch_no, files: igg_pipeline.out.census_data]
-    msvcf_data = [version_no: version_no, files: igg_pipeline.out.msvcf_data]
+    census_data = channel.of(
+        [batch_no: batch_no, files: igg_pipeline.out.census_data]
+    )
+    msvcf_data = channel.of(
+        [version_no: version_no, files: igg_pipeline.out.msvcf_data]
+    )
 }
 
 output {
