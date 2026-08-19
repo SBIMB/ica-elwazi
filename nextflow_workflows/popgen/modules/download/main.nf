@@ -18,13 +18,13 @@ process results_projects {
     """
     project_name=\$(cat ${config_file} | jq -r .ica_job_project.name)
     prefix=\${project_name%-jobs}
-    project_list=\$(icav2 projects list -o table)
+    icav2 projects list -o table > project_list
 
     census_project="\${prefix}-cohort-census"
-    census_project_id=\$(echo \${project_list} | grep \${census_project} | cut -f1)
+    census_project_id=\$(cat project_list | grep \${census_project} | cut -f1)
 
     msvcf_project="\${prefix}-msvcf-version-${version_no}"
-    msvcf_project_id=\$(echo \${project_list} | grep \${msvcf_project} | cut -f1)
+    msvcf_project_id=\$(cat project_list | grep \${msvcf_project} | cut -f1)
     """
 }
 
