@@ -5,7 +5,7 @@ params.config_file = './project-data/secret/project-config.json'
 params.input_config_dir = './popgen-dragen-igg-demo/project-data/config'
 params.gvcf_version = '3.9.5'
 params.batch_size = 2
-params.version_no = 1
+params.version = 1
 params.samples_dir = './test_data/version-1/'
 params.shards = '88,89'
 params.chroms = '20'
@@ -67,7 +67,7 @@ workflow {
     def config_file = file(params.config_file)
     def input_config = file(params.input_config_dir)
     def gvcf_version = params.gvcf_version
-    def version_no = params.version_no
+    def version_no = params.version
     def batch_no = 1
     def shards = params.shards
     def chroms = params.chroms
@@ -116,31 +116,31 @@ workflow {
 
 output {
     config_file {
-        path "version-${params.version_no}/project-data/secret/project-config.json"
+        path "version-${params.version}/project-data/secret/project-config.json"
         mode 'copy'
     }
     static_config {
-        path "version-${params.version_no}/project-data/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version_no}/project-data/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     version_batches {
-        path "version-${params.version_no}/project-data/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     version_genders {
-        path "version-${params.version_no}/project-data/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     census_data {
-        path "version-${params.version_no}/cohort-census/"
+        path "version-${params.version}/cohort-census/"
         mode 'copy'
     }
     msvcf_data {
-        path "version-${params.version_no}/msvcf/"
+        path "version-${params.version}/msvcf/"
         mode 'copy'
     }
 }
