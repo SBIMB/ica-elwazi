@@ -13,7 +13,7 @@ include { wait_for_ica as await_4 } from '../modules/await'
 include { annotate_variant } from '../modules/igg/step5'
 include { wait_for_ica as await_5 } from '../modules/await'
 
-include { results_projects ; cohort_census ; multi_sample_vcf } from '../modules/download'
+include { results_projects ; project_data as cohort_census ; project_data as multi_sample_vcf } from '../modules/download'
 
 include { delete_inputs as remove_sequence_data } from '../modules/delete_from_ica'
 include { delete_results as remove_census_data } from '../modules/delete_from_ica'
@@ -114,13 +114,13 @@ workflow igg_pipeline {
 
     results_projects(sync5, config_file, version_no)
 
-    cohort_census(results_projects.out.census_project, batch_no)
-    multi_sample_vcf(results_projects.out.msvcf_project, version_no)
+    cohort_census(results_projects.out.census_project)
+    multi_sample_vcf(results_projects.out.msvcf_project)
 
-    remove_census_data(results_projects.out.census_project, cohort_census.out.src)
-    remove_msvcf_data(results_projects.out.msvcf_project, multi_sample_vcf.out.src)
+    remove_census_data(results_projects.out.census_project, cohort_census.out.collect())
+    remove_msvcf_data(results_projects.out.msvcf_project, multi_sample_vcf.out.collect())
 
     emit:
-    census_data = cohort_census.out.dest
-    msvcf_data = multi_sample_vcf.out.dest
+    census_data = cohort_census.out.flatten().collect()
+    msvcf_data = multi_sample_vcf.out.flatten().collect()
 }

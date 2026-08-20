@@ -110,12 +110,8 @@ workflow {
     batch_gvcfs = batches
     version_batches = version_batches
     version_genders = version_genders
-    census_data = channel.of(
-        [batch_no: batch_no, files: igg_pipeline.out.census_data]
-    )
-    msvcf_data = channel.of(
-        [version_no: version_no, files: igg_pipeline.out.msvcf_data]
-    )
+    census_data = igg_pipeline.out.census_data
+    msvcf_data = igg_pipeline.out.msvcf_data
 }
 
 output {
@@ -140,15 +136,11 @@ output {
         mode 'copy'
     }
     census_data {
-        path { results ->
-            "version-${params.version_no}/cohort-census/batch-${results.batch_no}"
-        }
+        path "version-${params.version_no}/cohort-census/"
         mode 'copy'
     }
     msvcf_data {
-        path { results ->
-            "version-${params.version_no}/msvcf/version-${results.version_no}"
-        }
+        path "version-${params.version_no}/msvcf/"
         mode 'copy'
     }
 }

@@ -34,7 +34,6 @@ process project_data {
 
     input:
     val project_id
-    val results_path
 
     output:
     path "*"
@@ -43,7 +42,7 @@ process project_data {
     """
     icav2 projectdata download --project-id ${project_id} /data/* .
 
-    mv ${results_path}/* .
+    mv data/* .
     rm -rf data
     """
 }

@@ -15,8 +15,8 @@ workflow {
 
     view(results_projects.out)
 
-    cohort_census(results_projects.out.census_project, "data/batch-1")
-    multi_sample_vcf(results_projects.out.msvcf_project, "data")
+    cohort_census(results_projects.out.census_project)
+    multi_sample_vcf(results_projects.out.msvcf_project)
 
     publish:
     consensus_data = cohort_census.out.flatten().collect().map { files -> [label: "version-${params.version}", files: files] }

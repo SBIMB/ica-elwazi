@@ -24,9 +24,7 @@ process delete_results {
 
     input:
     val project_id
-    // We are deleting all the data from the project, but we take a second arg to ensure
-    // that the download has completed.
-    val src_dir
+    val semaphor
 
     script:
     """
