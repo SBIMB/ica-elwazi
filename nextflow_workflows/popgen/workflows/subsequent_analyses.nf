@@ -95,9 +95,11 @@ workflow {
     def batch_size = params.batch_size
     def samples_dir = file(params.samples_dir)
 
-    static_config = channel.fromPath(previous_data / 'project-data/config/*').collect()
+    previous_version = version_no - 1
 
-    prior_batches = channel.fromPath(previous_data / 'project-data/batch-gvcf/*').collect()
+    static_config = channel.fromPath(previous_data / "version-${previous_version}" / 'project-data/config/*').collect()
+
+    prior_batches = channel.fromPath(previous_data / "version-${previous_version}" / 'project-data/batch-gvcf/*').collect()
 
     prepare_project(
         config_file,
