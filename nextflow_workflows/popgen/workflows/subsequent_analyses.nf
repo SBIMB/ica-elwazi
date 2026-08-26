@@ -61,20 +61,20 @@ workflow prepare_project {
 workflow restore_outputs {
     take:
     config_file
-    previous_dir
+    results_dir
 
     main:
-    // version_no = 0. not used here.
+    // version_no = 0. cohort-census should use the same project for each version.
     results_projects('ok', config_file, 0)
     project_settings(config_file)
 
-    files = previous_dir / 'cohort-census/'
+    files = results_dir / '*' / 'cohort-census' / '*'
 
     census_uploader(
         project_settings.out.key,
         results_projects.out.census_project,
         files,
-        '.',
+        '*/cohort-census/*',
     )
 
     emit:

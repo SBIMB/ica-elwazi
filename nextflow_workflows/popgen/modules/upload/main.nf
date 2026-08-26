@@ -76,14 +76,16 @@ process upload_directory {
     val key
     val project_id
     // source ensures that the relevant files are present in the workdir for this process
-    path source
+    each path(source)
     // search_path specifies which files to upload
     val search_path
 
     script:
     """
     for file in \$(find -L ${search_path} -type f); do
-        icav2 projectdata upload \$file "/data/\$(dirname \$file)/" --project-id ${project_id} -k ${key}
+        path=\$dirname(\$file)
+        dest="/data/batch\${file#*batch}"
+        icav2 projectdata upload \$file \$dest --project-id ${project_id} -k ${key}
     done
     """
 }
