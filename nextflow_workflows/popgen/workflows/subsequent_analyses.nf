@@ -74,7 +74,7 @@ workflow restore_outputs {
         project_settings.out.key,
         results_projects.out.census_project,
         files,
-        '.',
+        'cohort-census',
     )
 
     emit:
