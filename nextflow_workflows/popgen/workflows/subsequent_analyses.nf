@@ -136,41 +136,37 @@ workflow {
     batch_gvcfs = batches
     version_batches = version_batches
     version_genders = version_genders
-    census_data = [batch_no: batch_no, files: igg_pipeline.out.census_data]
-    msvcf_data = [version_no: version_no, files: igg_pipeline.out.msvcf_data]
+    census_data = igg_pipeline.out.census_data
+    msvcf_data = igg_pipeline.out.msvcf_data
 }
 
 output {
     config_file {
-        path 'project-data/secret/project-config.json'
+        path "version-${params.version}/project-data/secret/project-config.json"
         mode 'copy'
     }
     static_config {
-        path 'project-data/'
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     batch_gvcfs {
-        path 'project-data/'
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     version_batches {
-        path 'project-data/'
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     version_genders {
-        path 'project-data/'
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     census_data {
-        path { results ->
-            "cohort-census/${results.batch_no}"
-        }
+        path "version-${params.version}/cohort-census/"
         mode 'copy'
     }
     msvcf_data {
-        path { results ->
-            "msvcf/${results.version_no}"
-        }
+        path "version-${params.version}/msvcf/"
         mode 'copy'
     }
 }
