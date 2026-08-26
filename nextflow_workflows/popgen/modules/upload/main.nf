@@ -83,8 +83,8 @@ process upload_directory {
     script:
     """
     for file in \$(find -L ${search_path} -type f); do
-        path=\$dirname(\$file)
-        dest="/data/batch\${file#*batch}/"
+        path=\$(dirname \$file)
+        dest="/data/batch\${path#*batch}/"
         icav2 projectdata upload \$file \$dest --project-id ${project_id} -k ${key}
     done
     """
