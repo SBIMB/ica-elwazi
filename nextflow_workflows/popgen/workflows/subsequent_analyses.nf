@@ -68,13 +68,13 @@ workflow restore_outputs {
     results_projects('ok', config_file, 0)
     project_settings(config_file)
 
-    files = results_dir / '*' / 'cohort-census' / '*'
+    files = results_dir / '*' / 'cohort-census'
 
     census_uploader(
         project_settings.out.key,
         results_projects.out.census_project,
         files,
-        '*/cohort-census/*',
+        '.',
     )
 
     emit:
