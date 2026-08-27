@@ -68,7 +68,7 @@ workflow restore_outputs {
     results_projects('ok', config_file, 0)
     project_settings(config_file)
 
-    files = results_dir / '*' / 'cohort-census'
+    files = results_dir / 'cohort-census'
 
     census_uploader(
         project_settings.out.key,
@@ -86,7 +86,7 @@ workflow {
     main:
 
     def config_file = file(params.config_file)
-    def previous_data = file(params.previous_results_dir)
+    def results = file(params.previous_results_dir)
     def version_no = params.version
     def batch_no = params.batch
     def shards = params.shards
@@ -97,9 +97,11 @@ workflow {
 
     previous_version = version_no - 1
 
-    static_config = channel.fromPath(previous_data / "version-${previous_version}" / 'project-data/config/*').collect()
+    previous_data = results / "version-${previous_version}"
 
-    prior_batches = channel.fromPath(previous_data / "version-${previous_version}" / 'project-data/batch-gvcf/*').collect()
+    static_config = channel.fromPath(previous_data / 'project-data/config/*').collect()
+
+    prior_batches = channel.fromPath(previous_data / 'project-data/batch-gvcf/*').collect()
 
     prepare_project(
         config_file,
