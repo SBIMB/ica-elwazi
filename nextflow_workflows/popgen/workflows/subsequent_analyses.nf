@@ -23,10 +23,10 @@ include { igg_pipeline } from '../workflows/pipeline.nf'
 
 process copy_config {
     input:
-    path config
+    path config, name: "config/*"
 
     output:
-    path config
+    path '.'
 
     script:
     """
