@@ -21,6 +21,19 @@ include { upload_files as genders_uploader } from '../modules/upload'
 
 include { igg_pipeline } from '../workflows/pipeline.nf'
 
+process copy_config {
+    input:
+    path config
+
+    output:
+    path config
+
+    script:
+    """
+        # no-op for copying these files to the results dir.
+    """
+}
+
 workflow prepare_project {
     take:
     config_file
@@ -134,7 +147,7 @@ workflow {
 
     publish:
     config_file = config_file
-    static_config = static_config
+    static_config = copy_config(static_config)
     batch_gvcfs = batches
     version_batches = version_batches
     version_genders = version_genders
