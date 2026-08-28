@@ -23,7 +23,7 @@ include { igg_pipeline } from '../workflows/pipeline.nf'
 
 process copy_config {
     input:
-    path config, name: 'config'
+    path config, name: 'config/*'
 
     output:
     path '.'
@@ -36,7 +36,7 @@ process copy_config {
 
 process copy_batches {
     input:
-    path config, name: 'batch-gvcf'
+    path config, name: 'batch-gvcf/*'
 
     output:
     path '.'
