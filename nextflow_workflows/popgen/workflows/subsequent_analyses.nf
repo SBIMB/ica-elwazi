@@ -23,7 +23,7 @@ include { igg_pipeline } from '../workflows/pipeline.nf'
 
 process copy_config {
     input:
-    path config, name: "config/*"
+    path config
 
     output:
     path '.'
@@ -148,7 +148,7 @@ workflow {
     publish:
     config_file = config_file
     static_config = copy_config(static_config)
-    batch_gvcfs = batches
+    batch_gvcfs = copy_config(batches)
     version_batches = version_batches
     version_genders = version_genders
     census_data = igg_pipeline.out.census_data
@@ -161,11 +161,11 @@ output {
         mode 'copy'
     }
     static_config {
-        path "version-${params.version}/project-data/"
+        path "version-${params.version}/project-data/config/"
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version}/project-data/"
+        path "version-${params.version}/project-data/batch-gvcf/"
         mode 'copy'
     }
     version_batches {
