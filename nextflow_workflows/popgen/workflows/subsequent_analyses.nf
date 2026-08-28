@@ -26,7 +26,7 @@ process copy_config {
     path config, name: 'config/*'
 
     output:
-    path 'config/*'
+    path 'config/*', includeInputs: true
 
     script:
     """
@@ -39,7 +39,7 @@ process copy_batches {
     path config, name: 'batch-gvcf/*'
 
     output:
-    path 'batch-gvcf/*'
+    path 'batch-gvcf/*', includeInputs: true
 
     script:
     """
