@@ -16,7 +16,7 @@ include { results_projects } from '../modules/download'
 include { project_settings ; upload_sequence_files } from '../modules/upload'
 include { upload_directory as census_uploader } from '../modules/upload'
 include { upload_files as config_uploader } from '../modules/upload'
-include { upload_files as batches_uploader } from '../modules/upload'
+include { upload_files as versions_uploader } from '../modules/upload'
 include { upload_files as genders_uploader } from '../modules/upload'
 
 include { igg_pipeline } from '../workflows/pipeline.nf'
@@ -60,7 +60,7 @@ workflow prepare_project {
     )
 
     config_uploader(project_settings.out.key, project_settings.out.id, static_config, '/meta/config/')
-    batches_uploader(project_settings.out.key, project_settings.out.id, version_batches, '/meta/version-batch/')
+    versions_uploader(project_settings.out.key, project_settings.out.id, version_batches, '/meta/version-batch/')
     genders_uploader(project_settings.out.key, project_settings.out.id, genders, '/meta/version-gender/')
 
     emit:
