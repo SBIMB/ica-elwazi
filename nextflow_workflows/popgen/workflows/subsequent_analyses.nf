@@ -161,7 +161,7 @@ workflow {
     publish:
     config_file = config_file
     static_config = copy_config(static_config)
-    batch_gvcfs = copy_config(batches)
+    batch_gvcfs = copy_batches(batches)
     version_batches = version_batches
     version_genders = version_genders
     census_data = igg_pipeline.out.census_data
