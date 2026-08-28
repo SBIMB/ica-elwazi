@@ -174,11 +174,11 @@ output {
         mode 'copy'
     }
     static_config {
-        path "version-${params.version}/project-data/config/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version}/project-data/batch-gvcf/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     version_batches {
