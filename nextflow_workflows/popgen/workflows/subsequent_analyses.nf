@@ -23,7 +23,20 @@ include { igg_pipeline } from '../workflows/pipeline.nf'
 
 process copy_config {
     input:
-    path config
+    path config, name: 'config'
+
+    output:
+    path '.'
+
+    script:
+    """
+        # no-op for copying these files to the results dir.
+    """
+}
+
+process copy_batches {
+    input:
+    path config, name: 'batch-gvcf'
 
     output:
     path '.'
@@ -161,11 +174,11 @@ output {
         mode 'copy'
     }
     static_config {
-        path "version-${params.version}/project-data/config/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version}/project-data/batch-gvcf/"
+        path "version-${params.version}/project-data/"
         mode 'copy'
     }
     version_batches {
