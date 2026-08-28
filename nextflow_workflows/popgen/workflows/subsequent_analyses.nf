@@ -26,7 +26,7 @@ process copy_config {
     path config, name: 'config/*'
 
     output:
-    path '.'
+    path 'config/*'
 
     script:
     """
@@ -39,7 +39,7 @@ process copy_batches {
     path config, name: 'batch-gvcf/*'
 
     output:
-    path '.'
+    path 'batch-gvcf/*'
 
     script:
     """
@@ -174,11 +174,11 @@ output {
         mode 'copy'
     }
     static_config {
-        path "version-${params.version}/project-data/"
+        path "version-${params.version}/project-data/config/"
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version}/project-data/"
+        path "version-${params.version}/project-data/batch-gvcf/"
         mode 'copy'
     }
     version_batches {
