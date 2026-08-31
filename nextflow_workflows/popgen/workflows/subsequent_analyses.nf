@@ -47,6 +47,19 @@ process copy_batches {
     """
 }
 
+process copy_genders {
+    input:
+    path config, name: 'version-gender/*'
+
+    output:
+    path 'version-gender/*', includeInputs: true
+
+    script:
+    """
+        # no-op for copying these files to the results dir.
+    """
+}
+
 workflow prepare_project {
     take:
     config_file
@@ -129,6 +142,8 @@ workflow {
 
     prior_batches = channel.fromPath(previous_data / 'project-data/batch-gvcf/*').collect()
 
+    prior_genders = channel.fromPath(previous_data / 'project-data/version-gender/*').collect()
+
     prepare_project(
         config_file,
         static_config,
@@ -142,7 +157,7 @@ workflow {
 
     batches = prepare_project.out.batches.mix(prior_batches).collect()
     version_batches = prepare_project.out.version_batches.collect()
-    version_genders = prepare_project.out.genders.collect()
+    version_genders = prepare_project.out.genders.mix(prior_genders).collect()
 
     igg_pipeline(
         config_file,
@@ -163,7 +178,7 @@ workflow {
     static_config = copy_config(static_config)
     batch_gvcfs = copy_batches(batches)
     version_batches = version_batches
-    version_genders = version_genders
+    version_genders = copy_genders(version_genders)
     census_data = igg_pipeline.out.census_data
     msvcf_data = igg_pipeline.out.msvcf_data
 }
