@@ -14,7 +14,7 @@ process wait_for_ica {
       project_id=\$(cat ${config} | jq -r .ica_job_project.id)
       job_id=\$(cat ${analysis_file} | jq -r .id)
 
-      timeout=\$((24*60*60)) # one day
+      timeout=\$((7*24*60*60)) # one week
       start=\$SECONDS
       request_errors=0
 
@@ -51,7 +51,7 @@ process wait_for_ica {
           exit 1
         fi
 
-        sleep 60
+        sleep 300
       done
     """
 }
