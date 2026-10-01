@@ -18,37 +18,88 @@ process project_settings {
     """
 }
 
+// process upload_input_files {
+//     errorStrategy 'retry'
+//     maxRetries 3
+
+//     input:
+//     path local_batches, name: "local-batch-gvcf/*"
+//     val key
+//     val project_id
+//     val project_name
+//     val version_no
+//     val batch_no
+
+//     output:
+//     path "batch-gvcf/batch-${batch_no}.gvcfs.csv", emit: batch_files
+//     env 'dest_dir', emit: upload_dir
+
+//     script:
+//     """
+//     mkdir batch-gvcf
+//     batch_file=batch-gvcf/batch-${batch_no}.gvcfs.csv
+//     dest_dir=/sequence_data/version_${version_no}/batch_${batch_no}/
+
+//     while IFS= read -r line; do
+//       filename=\$(basename \$line)
+//       dest=\${dest_dir}\${filename}
+//       icav2 projectdata upload \${line} \${dest} --project-id ${project_id} -k ${key}
+//       icav2 projectdata upload \${line}.tbi \${dest}.tbi --project-id ${project_id} -k ${key}
+//       echo "ica://${project_name}\${dest}" >> \${batch_file}
+//     done < local-batch-gvcf/batch-${batch_no}.gvcfs.csv
+
+//     icav2 projectdata upload \${batch_file} /meta/batch-gvcf/ --project-id ${project_id} -k ${key} 
+//     """
+// }
+
+workflow sequence_files {
+    take:
+    file_list
+    key
+    project_id
+    project_name
+    version_no
+    batch_no
+
+    main:
+    files_ch = channel.fromPath(file_list).splitText()
+
+    dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
+    uploads = upload_sequence_files(files_ch, key, project_id, dest_dir)
+
+    uploads
+        .map { dest -> "ica://${project_name}${dest}" }
+        .collectFile(
+            name: "batch-${batch_no}.gvcfs.csv",
+            storeDir: "project-data/batch-gvcf",
+            sort: true,
+        )
+
+    emit:
+    upload_dir = dest_dir
+    batch_files = channel.fromPath("project-data/batch-gvcf/batch-${batch_no}.gvcfs.csv")
+}
+
 process upload_sequence_files {
+    maxForks 4
     errorStrategy 'retry'
     maxRetries 3
 
     input:
-    path local_batches, name: "local-batch-gvcf/*"
+    path gvcf
     val key
     val project_id
-    val project_name
-    val version_no
-    val batch_no
+    val dest_dir
 
     output:
-    path "batch-gvcf/batch-${batch_no}.gvcfs.csv", emit: batch_files
-    env 'dest_dir', emit: upload_dir
+    env 'dest'
 
     script:
-    """
-    mkdir batch-gvcf
-    batch_file=batch-gvcf/batch-${batch_no}.gvcfs.csv
-    dest_dir=/sequence_data/version_${version_no}/batch_${batch_no}/
-
-    while IFS= read -r line; do
-      filename=\$(basename \$line)
-      dest=\${dest_dir}\${filename}
-      icav2 projectdata upload \${line} \${dest} --project-id ${project_id} -k ${key}
-      icav2 projectdata upload \${line}.tbi \${dest}.tbi --project-id ${project_id} -k ${key}
-      echo "ica://${project_name}\${dest}" >> \${batch_file}
-    done < local-batch-gvcf/batch-${batch_no}.gvcfs.csv
-
-    icav2 projectdata upload \${batch_file} /meta/batch-gvcf/ --project-id ${project_id} -k ${key} 
+    """  
+    filename=\$(basename ${gvcf})
+    dest=${dest_dir}\${filename}
+    icav2 projectdata upload ${gvcf} \${dest} --project-id ${project_id} -k ${key}
+    icav2 projectdata upload ${gvcf}.tbi \${dest}.tbi --project-id ${project_id} -k ${key}
     """
 }
 

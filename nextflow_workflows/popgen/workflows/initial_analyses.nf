@@ -13,7 +13,7 @@ params.concat_options = 'reduced-site-vcf,reduced-vcf,pgen,site-vcf,vcf'
 
 include { write_config } from '../modules/configure'
 include { batch_files } from '../modules/prepare_samples'
-include { project_settings ; upload_sequence_files } from '../modules/upload'
+include { project_settings ; sequence_files } from '../modules/upload'
 include { upload_files as config_uploader } from '../modules/upload'
 include { upload_files as batches_uploader } from '../modules/upload'
 include { upload_files as genders_uploader } from '../modules/upload'
@@ -39,7 +39,7 @@ workflow prepare_project {
     version_batches = batch_files.out.version_batches
     genders = batch_files.out.genders
 
-    upload_sequence_files(
+    sequence_files(
         batch_files.out.local_batches,
         project_settings.out.key,
         project_settings.out.id,
@@ -53,8 +53,8 @@ workflow prepare_project {
     genders_uploader(project_settings.out.key, project_settings.out.id, genders, '/meta/version-gender/')
 
     emit:
-    batches = upload_sequence_files.out.batch_files
-    sequence_dir = upload_sequence_files.out.upload_dir
+    batches = sequence_files.out.batch_files
+    sequence_dir = sequence_files.out.upload_dir
     static_config
     version_batches
     genders
