@@ -62,7 +62,7 @@ workflow sequence_files {
     batch_no
 
     main:
-    files_ch = channel.fromPath(file_list).splitText()
+    files_ch = file_list.splitText()
 
     dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
     uploads = upload_sequence_files(files_ch, key, project_id, dest_dir)
