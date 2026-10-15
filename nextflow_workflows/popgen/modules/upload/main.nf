@@ -71,9 +71,7 @@ workflow sequence_files {
     dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
     uploads = upload_sequence_files(files_ch, key, project_id, dest_dir)
 
-    uploads
-        .collect()
-        .view()
+    file_list = uploads
         .map { dest -> "ica://${project_name}${dest}" }
         .collectFile(
             name: "batch-${batch_no}.gvcfs.csv",
@@ -83,7 +81,7 @@ workflow sequence_files {
 
     emit:
     upload_dir = dest_dir
-    batch_files = "project-data/batch-gvcf/batch-${batch_no}.gvcfs.csv"
+    batch_files = file_list
 }
 
 process upload_sequence_files {
