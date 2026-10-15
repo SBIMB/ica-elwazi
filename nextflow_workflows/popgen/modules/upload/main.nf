@@ -64,6 +64,8 @@ workflow sequence_files {
     main:
     files_ch = file_list
         .splitText()
+        .map { p -> p.trim() }
+        .filter { p -> p }
         .map { p -> tuple(file(p), file("${p}.tbi")) }
 
     dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
