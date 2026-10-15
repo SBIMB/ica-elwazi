@@ -65,7 +65,7 @@ workflow sequence_files {
     files_ch = file_list.splitText()
 
     dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
-    uploads = upload_sequence_files(files_ch, key, project_id, dest_dir)
+    uploads = upload_sequence_files(files_ch, key, project_id, dest_dir).collect()
 
     uploads
         .map { dest -> "ica://${project_name}${dest}" }
