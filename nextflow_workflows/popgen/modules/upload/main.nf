@@ -62,10 +62,12 @@ workflow sequence_files {
     batch_no
 
     main:
-    files_ch = file_list.splitText()
+    files_ch = file_list
+        .splitText()
+        .map { p -> tuple(file(p), file("${p}.tbi")) }
 
     dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
-    uploads = upload_sequence_files(files_ch, key, project_id, dest_dir).collect()
+    uploads = upload_sequence_files(files_ch, key, project_id, dest_dir)
 
     uploads
         .map { dest -> "ica://${project_name}${dest}" }
@@ -77,7 +79,7 @@ workflow sequence_files {
 
     emit:
     upload_dir = dest_dir
-    batch_files = channel.fromPath("project-data/batch-gvcf/batch-${batch_no}.gvcfs.csv")
+    batch_files = "project-data/batch-gvcf/batch-${batch_no}.gvcfs.csv"
 }
 
 process upload_sequence_files {
@@ -86,7 +88,7 @@ process upload_sequence_files {
     maxRetries 3
 
     input:
-    path gvcf
+    tuple path(gvcf), path(tbi)
     val key
     val project_id
     val dest_dir
@@ -99,7 +101,7 @@ process upload_sequence_files {
     filename=\$(basename ${gvcf})
     dest=${dest_dir}\${filename}
     icav2 projectdata upload ${gvcf} \${dest} --project-id ${project_id} -k ${key}
-    icav2 projectdata upload ${gvcf}.tbi \${dest}.tbi --project-id ${project_id} -k ${key}
+    icav2 projectdata upload ${tbi} \${dest}.tbi --project-id ${project_id} -k ${key}
     """
 }
 
