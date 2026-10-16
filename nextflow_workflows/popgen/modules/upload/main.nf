@@ -70,10 +70,10 @@ workflow sequence_files {
 
     dest_dir = "/sequence_data/version_${version_no}/batch_${batch_no}/"
     uploads = upload_sequence_files(files_ch, key, project_id, dest_dir)
-    project = project_name.toString()
 
     file_list = uploads
-        .map { dest -> "ica://${project}${dest}".toString() }
+        .combine(project_name)
+        .map { dest, proj -> "ica://${proj}${dest}".toString() }
         .collectFile(
             name: "batch-${batch_no}.gvcfs.csv",
             storeDir: "project-data/batch-gvcf",
