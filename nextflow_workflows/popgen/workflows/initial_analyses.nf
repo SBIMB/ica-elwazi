@@ -50,7 +50,7 @@ workflow prepare_project {
     )
 
     config_uploader(project_settings.out.key, project_settings.out.id, static_config, '/meta/config/')
-    samples_uploader(project_settings.out.key, project_settings.out.id, sequence_files.out.batch_files, '/meta/batch-gvcfs/')
+    samples_uploader(project_settings.out.key, project_settings.out.id, sequence_files.out.batch_files, '/meta/batch-gvcf/')
     batches_uploader(project_settings.out.key, project_settings.out.id, version_batches, '/meta/version-batch/')
     genders_uploader(project_settings.out.key, project_settings.out.id, genders, '/meta/version-gender/')
 
@@ -126,7 +126,7 @@ output {
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version}/project-data/batch-gvcfs/"
+        path "version-${params.version}/project-data/batch-gvcf/"
         mode 'copy'
     }
     version_batches {
