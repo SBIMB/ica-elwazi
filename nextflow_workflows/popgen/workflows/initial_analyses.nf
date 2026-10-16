@@ -15,6 +15,7 @@ include { write_config } from '../modules/configure'
 include { batch_files } from '../modules/prepare_samples'
 include { project_settings ; sequence_files } from '../modules/upload'
 include { upload_files as config_uploader } from '../modules/upload'
+include { upload_files as samples_uploader } from '../modules/upload'
 include { upload_files as batches_uploader } from '../modules/upload'
 include { upload_files as genders_uploader } from '../modules/upload'
 
@@ -49,6 +50,7 @@ workflow prepare_project {
     )
 
     config_uploader(project_settings.out.key, project_settings.out.id, static_config, '/meta/config/')
+    samples_uploader(project_settings.out.key, project_settings.out.id, sequence_files.out.batch_files, '/meta/batch-gvcfs/')
     batches_uploader(project_settings.out.key, project_settings.out.id, version_batches, '/meta/version-batch/')
     genders_uploader(project_settings.out.key, project_settings.out.id, genders, '/meta/version-gender/')
 
