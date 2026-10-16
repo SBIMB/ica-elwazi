@@ -76,7 +76,6 @@ workflow sequence_files {
         .map { dest, proj -> "ica://${proj}${dest}".toString() }
         .collectFile(
             name: "batch-${batch_no}.gvcfs.csv",
-            storeDir: "project-data/batch-gvcf",
             newLine: true,
             sort: true,
         )

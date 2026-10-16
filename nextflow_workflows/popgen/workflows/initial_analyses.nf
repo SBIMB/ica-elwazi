@@ -124,7 +124,7 @@ output {
         mode 'copy'
     }
     batch_gvcfs {
-        path "version-${params.version}/project-data/"
+        path "version-${params.version}/project-data/batch-gvcfs/"
         mode 'copy'
     }
     version_batches {
