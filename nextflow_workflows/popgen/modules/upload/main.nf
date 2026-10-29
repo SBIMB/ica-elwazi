@@ -69,8 +69,8 @@ process upload_sequence_files {
     """  
     filename=\$(basename ${gvcf})
     dest=${dest_dir}\${filename}
-    icav2 projectdata upload ${gvcf} \${dest} --project-id ${project_id} -k ${key}
-    icav2 projectdata upload ${tbi} \${dest}.tbi --project-id ${project_id} -k ${key}
+    #icav2 projectdata upload ${gvcf} \${dest} --project-id ${project_id} -k ${key}
+    #icav2 projectdata upload ${tbi} \${dest}.tbi --project-id ${project_id} -k ${key}
     """
 }
 
