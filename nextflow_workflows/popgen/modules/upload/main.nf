@@ -18,40 +18,6 @@ process project_settings {
     """
 }
 
-// process upload_input_files {
-//     errorStrategy 'retry'
-//     maxRetries 3
-
-//     input:
-//     path local_batches, name: "local-batch-gvcf/*"
-//     val key
-//     val project_id
-//     val project_name
-//     val version_no
-//     val batch_no
-
-//     output:
-//     path "batch-gvcf/batch-${batch_no}.gvcfs.csv", emit: batch_files
-//     env 'dest_dir', emit: upload_dir
-
-//     script:
-//     """
-//     mkdir batch-gvcf
-//     batch_file=batch-gvcf/batch-${batch_no}.gvcfs.csv
-//     dest_dir=/sequence_data/version_${version_no}/batch_${batch_no}/
-
-//     while IFS= read -r line; do
-//       filename=\$(basename \$line)
-//       dest=\${dest_dir}\${filename}
-//       icav2 projectdata upload \${line} \${dest} --project-id ${project_id} -k ${key}
-//       icav2 projectdata upload \${line}.tbi \${dest}.tbi --project-id ${project_id} -k ${key}
-//       echo "ica://${project_name}\${dest}" >> \${batch_file}
-//     done < local-batch-gvcf/batch-${batch_no}.gvcfs.csv
-
-//     icav2 projectdata upload \${batch_file} /meta/batch-gvcf/ --project-id ${project_id} -k ${key} 
-//     """
-// }
-
 workflow sequence_files {
     take:
     file_list
