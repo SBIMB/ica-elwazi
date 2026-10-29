@@ -36,20 +36,21 @@ workflow igg_pipeline {
 
     main:
 
-    step1_jobs = aggregate_gvcf(
-        config_file,
-        static_config,
-        batches,
-        version_batches,
-        version_genders,
-        batch_no,
-        shards,
-    )
+    // step1_jobs = aggregate_gvcf(
+    //     config_file,
+    //     static_config,
+    //     batches,
+    //     version_batches,
+    //     version_genders,
+    //     batch_no,
+    //     shards,
+    // )
 
-    sync1 = await_1(config_file, step1_jobs).collect()
+    // sync1 = await_1(config_file, step1_jobs).collect()
 
-    remove_sequence_data(sync1, config_file, sequence_dir)
+    // remove_sequence_data(sync1, config_file, sequence_dir)
 
+    sync1 = 'ok'
     step2_jobs = aggregate_census(
         sync1,
         config_file,
