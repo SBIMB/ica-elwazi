@@ -93,6 +93,7 @@ workflow {
     version_genders = prepare_project.out.genders.collect()
 
     igg_pipeline(
+        'ok',
         config_file,
         static_config,
         batches,

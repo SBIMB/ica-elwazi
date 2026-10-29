@@ -120,6 +120,7 @@ workflow restore_outputs {
 
     emit:
     census_project = results_projects.out.census_project
+    complete = census_uploader.out.done.collect()
 }
 
 workflow {
@@ -156,12 +157,14 @@ workflow {
     )
 
     restore_outputs(config_file, previous_data)
+    ready = restore_outputs.out.complete
 
     batches = prepare_project.out.batches.mix(prior_batches).collect()
     version_batches = prepare_project.out.version_batches.collect()
     version_genders = prepare_project.out.genders.mix(prior_genders).collect()
 
     igg_pipeline(
+        ready,
         config_file,
         static_config,
         batches,

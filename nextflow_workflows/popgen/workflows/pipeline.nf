@@ -21,6 +21,7 @@ include { delete_results as remove_msvcf_data } from '../modules/delete_from_ica
 
 workflow igg_pipeline {
     take:
+    ready
     config_file
     static_config
     batches

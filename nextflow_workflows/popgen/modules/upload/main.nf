@@ -136,6 +136,9 @@ process upload_directory {
     // search_path specifies which files to upload
     val search_path
 
+    output:
+    val true, emit: done
+
     script:
     """
     for file in \$(find -L ${search_path} -type f); do
