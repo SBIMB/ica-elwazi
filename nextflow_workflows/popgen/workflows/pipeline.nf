@@ -52,7 +52,7 @@ workflow igg_pipeline {
 
     sync1 = 'ok'
     step2_jobs = aggregate_census(
-        sync1,
+        sync1.combine(ready).collect(),
         config_file,
         static_config,
         batches,
