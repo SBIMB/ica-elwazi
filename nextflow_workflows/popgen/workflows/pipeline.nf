@@ -50,9 +50,9 @@ workflow igg_pipeline {
 
     // remove_sequence_data(sync1, config_file, sequence_dir)
 
-    sync1 = 'ok'
+    sync1 = channel.value('ok')
     step2_jobs = aggregate_census(
-        sync1.combine(ready).collect(),
+        sync1.combine(ready),
         config_file,
         static_config,
         batches,
